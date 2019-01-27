@@ -116,6 +116,8 @@ class Dense():
         """
         self.W = np.random.rand(input_dim, output_dim)
         self.b = np.random.rand(1, output_dim)
+        self.dW = np.zeros([input_dim, output_dim])
+        self.db = np.zeros([1, output_dim])
         
     def forward(self, X, update=True):
         """
@@ -145,6 +147,56 @@ class Gradient_descend():
         return layers
     
     
+class Adam():
+    """
+    Implements Adam optimizer
+    """
+    def __init__(self, learning_rate=0.001):
+        self.learning_rate = learning_rate
+        self.beta_1 = 0.9
+        self.beta_2 = 0.999
+        self.epsilon = 1e-8
+        self.learning_rate = 0.0001
+        self.t = 1
+        
+    def initialize_parameters(self, layers):
+        """
+        
+        """
+        for i, layer in enumerate(layers):
+            adam = {
+                "mW" : np.zeros(layer.dW.shape),
+                "mb" : np.zeros(layer.db.shape),
+                "vW" : np.zeros(layer.dW.shape),
+                "vb" : np.zeros(layer.db.shape)}
+            layers[i].adam = adam
+        return layers
+
+        
+    def update_weights(self, layers):
+        t = self.t
+        for i, layer in enumerate(layers):            
+            adam  = {
+                "mW" : (self.beta_1*layer.adam["mW"] + (1-self.beta_1)*layer.dW),
+                "mb" : (self.beta_1*layer.adam["mb"] + (1-self.beta_1)*layer.db),
+                "vW" : (self.beta_2*layer.adam["vW"] + (1-self.beta_2)*layer.dW**2),
+                "vb" : (self.beta_2*layer.adam["vb"] + (1-self.beta_2)*layer.db**2)}
+            
+            layer.adam = adam
+            
+            mW_corrected  = adam["mW"] / (1-(self.beta_1**t))
+            mb_corrected  = adam["mb"] / (1-(self.beta_1**t))
+            vW_corrected  = adam["vW"] / (1-(self.beta_2**t))
+            vb_corrected  = adam["vb"] / (1-(self.beta_2**t))
+            
+            layer.W = layer.W - (self.learning_rate * mW_corrected/(np.sqrt(vW_corrected)+ self.epsilon))
+            layer.b = layer.b - (self.learning_rate * mb_corrected/(np.sqrt(vb_corrected)+ self.epsilon))
+            
+            layers[i] = layer
+        self.t = t+1
+        return layers
+    
+    
 class MLP():
     """
     Multi-layer perceptron
@@ -154,7 +206,8 @@ class MLP():
                  hidden_layers = [2,2], 
                  activation = "sigmoid",
                  loss = "mse", 
-                 problem="regression"):
+                 problem="regression",
+                 optimizer ="gradient_descent"):
         """
         Initialize network
         
@@ -166,6 +219,7 @@ class MLP():
         
         """
         
+        self.print_rate = 100
         self._activation = activation
         self.dims = [X.shape[1]] + hidden_layers + [1]
 
@@ -187,8 +241,13 @@ class MLP():
             self._layers[-1].activation = Sigmoid()
         
         # Set optimizer
-        self._optimizer = Gradient_descend()
-        
+        if optimizer == "gradient_descent":
+            self._optimizer = Gradient_descent()
+        if optimizer == "adam":
+            self._optimizer = Adam()
+            self._layers = self._optimizer.initialize_parameters(self._layers)
+            
+            
     def _build_architecture(self):
         """
         Build architecture of MLP
@@ -265,7 +324,7 @@ class MLP():
         self.reg_lambda = reg_lambda
         for i in range(n_iter):
             self._train_step(X,y)         
-            if  verbose:
+            if  verbose and i%self.print_rate==0:
                 train_loss = self._compute_loss(self._layers[-1].A,y)
                 print(f"iter: {i}  loss: {train_loss}")
                 
