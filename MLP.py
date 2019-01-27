@@ -18,7 +18,6 @@ class Sigmoid():
         """
         return (1-self.forward(x)) * self.forward(x)
     
-    
 class Relu():
     """
     ReLu activation function
@@ -35,7 +34,6 @@ class Relu():
         Derivative of the function at one point
         """
         return np.where(x>0, 1., 0.)
-    
     
 class Tanh():
     """
@@ -89,12 +87,12 @@ class Logloss():
     Mean Squared error class
     """
     def forward(self, actual, prediction):
-        return actual*np.log(prediction) + (1-actual)*log(1-prediction)
+        return actual*np.log(prediction) + (1-actual)*np.log(1-prediction)
     
     def derivate(self, actual, prediction):
         return (actual-prediction)/(prediction*(1-actual))
     
-# Layers
+    
 class Dense():
     def __init__(self, input_dim, output_dim, activation = "sigmoid"):
         """
@@ -102,13 +100,13 @@ class Dense():
         """
     
         if activation == "sigmoid": 
-            self.activation = activations.Sigmoid()
+            self.activation = Sigmoid()
         if activation == "relu": 
-            self.activation = activations.Relu()
+            self.activation = Relu()
         if activation == "tanh": 
-            self.activation = activations.Tanh()
+            self.activation = Tanh()
         if activation == "linear": 
-            self.activation = activations.Linear()
+            self.activation = Linear()
             
         self.reset_layer(input_dim, output_dim)
         
@@ -128,7 +126,23 @@ class Dense():
         if update:
             self.Z = Z
             self.A = A
-        return self.A 
+        return A 
+    
+    
+# Optimizers
+class Gradient_descend():
+    """
+    Implements gradient descend optimizer
+    """
+    def __init__(self, learning_rate=0.001):
+        self.learning_rate = learning_rate
+        
+    def update_weights(self, layers):
+        for i in range(len(layers)):
+            layers[i].W = layers[i].W - self.learning_rate * layers[i].dW
+            layers[i].b = layers[i].b - self.learning_rate * layers[i].db
+        
+        return layers
     
     
 class MLP():
@@ -155,17 +169,25 @@ class MLP():
         self._activation = activation
         self.dims = [X.shape[1]] + hidden_layers + [1]
 
-        if loss == "mse":
-            self._loss = MSE()
+        # Create layers
         self._build_architecture()
         
+        # Losses
+        if loss == "mse":
+            self._loss = MSE()
+        if loss == "logloss":
+            self._loss = Logloss()
+        
+        # Output activation
         if problem == "regression" : 
             self._layers[-1].activation = Linear()
         if problem == "quantile" : 
             self._layers[-1].activation = Linear()
         if problem == "binary_classification":
-            self.layers[-1].activation = Sigmoid()
+            self._layers[-1].activation = Sigmoid()
         
+        # Set optimizer
+        self._optimizer = Gradient_descend()
         
     def _build_architecture(self):
         """
@@ -175,7 +197,8 @@ class MLP():
         self._layers = []
         for input_dim, output_dim in  zip(self.dims[:-1], self.dims[1:]):
             self._layers.append(Dense(input_dim, output_dim, activation=self._activation))
-    
+        self.n_layers = len(self._layers)
+        
     def _forward_prop(self, X, update=True):
         """
         Computes a forward pass though the architecture of the network
@@ -198,61 +221,61 @@ class MLP():
         """
         
         """
-        # Loop to compute layer errors 
         for i in np.arange(len(self._layers))+1:
+            # Compute deltas deltas 
             layer = self._layers[-i]
             if i==1:
-                error = self._loss.derivate(y, layer.A) * layer.activation.derivate(layer.Z)
-                self._layers[-i].error = error
+                delta = self._loss.derivate(y, layer.A) * layer.activation.derivate(layer.Z)
             else:
                 i_next = i-1
                 layer_next = self._layers[-i_next]
-                error = np.matmul(layer_next.error, layer_next.W.T) * layer.activation.derivate(layer.Z)
-                self._layers[-i].error = error
-        
-        # Loop to compute deltas
-        for i in range(len(self._layers)):
-            layer = self._layers[i]
-            # Compute for bias
-            if i==0:
+                delta = np.matmul(layer_next.delta, layer_next.W.T) * layer.activation.derivate(layer.Z)
+            self._layers[-i].delta = delta
+            
+            # Compute gradients
+            if i==self.n_layers:
                 a_in = X
             else:
-                a_in = self._layers[i-1].A
-            error_out = self._layers[i].error
-            self._layers[i].delta_b = error_out
-            self._layers[i].delta_W = np.matmul(a_in.T,  error_out) 
+                i_prev = i+1
+                a_in = self._layers[-i_prev].A
+            delta_out = self._layers[-i].delta
+            self._layers[-i].db = delta_out.sum(axis=0).reshape([1,-1])
+            self._layers[-i].dW = np.matmul(a_in.T,  delta_out) 
+            self._layers[-i].dW += self.reg_lambda * self._layers[-i].W
             
-    def _update_weights(self):
+    def _train_step(self, X, y):
         """
-        Implements update rule
+        
         """
-        for i in range(len(self._layers)):
-            self._layers[i].W = self._layers[i].W - self.learning_rate * self._layers[i].delta_W
-            self._layers[i].b = self._layers[i].b - self.learning_rate * self._layers[i].delta_b
+        # Forward propagation
+        _ = self._forward_prop(X)
+
+        # Back propagation
+        self._back_prop(X,y)
+
+        # Update rule
+        self._layers = self._optimizer.update_weights(self._layers)
+            
+
+    def train(self, X, y, n_iter=100, learning_rate=0.0001, reg_lambda=0.01,  verbose=True):
+        """
         
-    def train(self, X, y, n_iter=100, learning_rate=0.0001, verbose=True):
-        self.learning_rate = learning_rate
-        
+        """
+        self._optimizer.learning_rate = learning_rate
+        self.reg_lambda = reg_lambda
         for i in range(n_iter):
-            
-            # Forward propagation
-            _ = self._forward_prop(X)
-            
+            self._train_step(X,y)         
             if  verbose:
-                print(self._compute_loss(self._layers[-1].A,y))
-            
-            # Back propagation
-            self._back_prop(X,y)
-            
-            # Update rule
-            self._update_weights()
-            
-            
+                train_loss = self._compute_loss(self._layers[-1].A,y)
+                print(f"iter: {i}  loss: {train_loss}")
+                
+
     def _compute_loss(self, actual, prediction):
         """
         Computes loss between prediction and target
         """
         
-        current_loss = self._current_loss = self._loss.forward(actual, prediction)
+        current_loss = self._loss.forward(actual, prediction)
         current_loss = np.mean(current_loss)
-        return current_loss   
+        return current_loss
+    
