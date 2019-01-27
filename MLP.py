@@ -1,6 +1,7 @@
 import numpy as np
 
 
+# Activation functions
 class Sigmoid():
     """
     Sigmoid activation function
@@ -93,6 +94,7 @@ class Logloss():
         return (actual-prediction)/(prediction*(1-actual))
     
     
+# Layers
 class Dense():
     def __init__(self, input_dim, output_dim, activation = "sigmoid"):
         """
@@ -156,7 +158,6 @@ class Adam():
         self.beta_1 = 0.9
         self.beta_2 = 0.999
         self.epsilon = 1e-8
-        self.learning_rate = 0.0001
         self.t = 1
         
     def initialize_parameters(self, layers):
@@ -196,7 +197,8 @@ class Adam():
         self.t = t+1
         return layers
     
-    
+
+# Model
 class MLP():
     """
     Multi-layer perceptron
