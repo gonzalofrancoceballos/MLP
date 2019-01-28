@@ -470,8 +470,7 @@ class MLP():
         if optimizer == "adam":
             self._optimizer = Adam()
             self._layers = self._optimizer.initialize_parameters(self._layers)
-            
-            
+        
     def _build_architecture(self):
         """
         Build architecture of MLP. 
@@ -556,24 +555,62 @@ class MLP():
         self._layers = self._optimizer.update_weights(self._layers)
             
 
-    def train(self, X, y, n_iter=100, learning_rate=0.0001, reg_lambda=0.01,  verbose=True):
+    def train(self, X, y, X_dev=None, y_dev=None,
+              n_epoch=100, batch_size=128, n_stopping_rounds=10, 
+              learning_rate=0.0001, reg_lambda=0.01, verbose=True):
         """
         Run several train steps
         :param X: input matrix to the network (type: np.array)
         :param y: target vector (type: np.array)
-        :param n_iter: number of train iterations
-        :param learning_rate: learning rate fot the optimizer
-        :param reg_lambda: weights regulariazation factor
-        :param verbose: to plot train loss
+        :param X_dev: development matrix for early stopping (type: np.array)
+        :param y_dev: development target vector (type: np.array)
+        :param n_iter: number of train iterations (type: int)
+        :param n_epoch: number of epochs (type: int)
+        :param batch_size: batch size (type: int)
+        :param n_stopping_rounds: number of iterations before early stopping (type: int)
+        :param learning_rate: learning rate fot the optimizer (type: float)
+        :param reg_lambda: weights regulariazation factor (type: float)
+        :param verbose: to plot train loss (type bool)
         """
+        
         self._optimizer.learning_rate = learning_rate
         self.reg_lambda = reg_lambda
-        for i in range(n_iter):
-            self._train_step(X,y)         
-            if  verbose and i%self.print_rate==0:
-                train_loss = self._compute_loss(self._layers[-1].A,y)
-                print(f"iter: {i}  loss: {train_loss}")
+        self._batch_size = batch_size
+        self._n_epoch = n_epoch
+        self._batcher = Batcher([X,y], batch_size=self._batch_size)
+        self._n_stopping_rounds = n_stopping_rounds
+        early_stopping = False
+        epoch = 1
+        best_loss = 1e14
+        early_stopping_counter = 0
+        
+        # Start train
+        while epoch <=self._n_epoch and early_stopping_counter<self._n_stopping_rounds:
+            train_loss = []
+            self._batcher.reset()
+            for batch_i in range(self._batcher.n_batches):
+                X_batch, y_batch = self._batcher.next()
+                self._train_step(X_batch, y_batch)
+                train_loss.append(self._compute_loss(self._layers[-1].A,y_batch))
                 
+            if type(X_dev) == np.ndarray and type(y_dev) == np.ndarray:
+                dev_pred = self.predict(X_dev)
+                dev_loss = self._compute_loss(dev_pred,y_dev)
+                
+                if best_loss > dev_loss:
+                    early_stopping_counter = 0
+                    best_loss = dev_loss
+                else:
+                    early_stopping_counter += 1
+                    
+                if verbose:
+                    print(f"epoch: {epoch} | train_loss: {np.mean(train_loss)} |  dev_loss: {dev_loss}") 
+                        
+            else:
+                if verbose:
+                    print(f"epoch: {epoch} | train_loss: {np.mean(train_loss)}")
+                
+            epoch = epoch+1
 
     def _compute_loss(self, actual, prediction):
         """
