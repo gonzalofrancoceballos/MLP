@@ -1,10 +1,13 @@
 """
 Simple and light-weight implementation of a Multi-Layer Perceptron using Numpy
+
 Copyright 2019 Gonzalo Franco Ceballos <gonzalofrancoceballos@gmail.com>
+
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
+
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -13,13 +16,26 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+"""
+TODO:
+- Mini-batch
+- Train-dev with early stopping
+- Validate classification
+- Quantile regression
+- Load/save model functionality
+"""
 
 import numpy as np
 
 
 # Activation functions
-def swish(x):
-    return x*Sigmoid().forward(x)
+def sigmoid(x):
+    """
+    Sigmoid function
+    :param x: input matrix (type:np.array)
+    :output: result of applying sigmoid functin element-wise
+    """
+    return 1. / (1. + np.exp(-x))
 
 
 class Sigmoid():
@@ -33,7 +49,7 @@ class Sigmoid():
         :param x: tensor apply operation element-wise (type: np.array)
         :return: result of the operation (type: np.array)
         """
-        return 1. / (1. + np.exp(-x))
+        return sigmoid(x)
         
     def derivate(self, x):
         """
@@ -41,17 +57,15 @@ class Sigmoid():
         :param x: tensor apply operation element-wise (type: np.array)
         :return: result of the operation (type: np.array)
         """
-        return (1-self.forward(x)) * self.forward(x)
+        return (1-sigmoid(x)) * sigmoid(x)
 
 class Swish():
     """
     Swish activation function
     """
-    def _sigmoid(self, x):
-        return 1. / (1. + np.exp(-x))
-    
+   
     def _sigmoid_p(self, x):
-        return (1-self._sigmoid(x)) * self._sigmoid(x)
+        return (1-sigmoid(x)) * sigmoid(x)
     
     def forward(self, x):
         """
@@ -59,7 +73,7 @@ class Swish():
         :param x: tensor apply operation element-wise (type: np.array)
         :return: result of the operation (type: np.array)
         """
-        return x * self._sigmoid(x)
+        return x * sigmoid(x)
         
     def derivate(self, x):
         """
@@ -67,7 +81,7 @@ class Swish():
         :param x: tensor apply operation element-wise (type: np.array)
         :return: result of the operation (type: np.array)
         """
-        return x*self._sigmoid_p(x) + self._sigmoid(x)
+        return x*self._sigmoid_p(x) + sigmoid(x)
 
 class Relu():
     """
