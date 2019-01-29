@@ -1,8 +1,4 @@
-"""
-Snippet of code run a simple MLP model
-"""
-
-from MLP import MLP
+import models
 import numpy as np
 
 # Dummy function to create synthetic dataset
@@ -25,12 +21,26 @@ N = 100000
 N_dev = 1000
 X = np.random.rand(N, 3)
 X_dev = np.random.rand(N, 3)
+X_pred = np.random.rand(N, 3)
 y = f(X)
 y_dev = f(X_dev)
+y_pred = f(X_pred)
 
 
 # Instantiating model object
-mlp = MLP(X, hidden_layers=[2,2,3], activation="relu", optimizer="adam")
+mlp = models.MLP(X, hidden_layers=[5,4,2], activation="tanh", optimizer="adam")
 
-# Running train
-mlp.train(X,y, n_epoch=100, verbose=True)
+# Model train
+mlp.train(X,y,
+          X_dev=X_dev, 
+          y_dev=y_dev,
+          n_epoch=100,
+          n_stopping_rounds=30)
+
+
+# Run predict on new data
+predictions = mlp.predict(X_pred)
+
+# Evaluate model performance using the same metric it used to train
+performance = mlp._compute_loss(predictions,y_pred)
+print(f"Prediction loss: {performance}")
