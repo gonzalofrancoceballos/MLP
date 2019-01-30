@@ -19,17 +19,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
 TODO:
-- Mini-batch (testing)
-- Train-dev with early stopping (testing)
-- Validate classification
-- Quantile regression
-- Load/save model functionality
+- Load/save model functionality (testing)
 """
 
 import numpy as np
 import activations
 import losses
 import optimizers
+import model_utils
 from data_processing import Batcher
 from layers import Dense
 
@@ -40,13 +37,14 @@ class MLP():
     Multi-layer perceptron
     """
     def __init__(self, 
-                 X, 
+                 X=None, 
                  hidden_layers = [2,2], 
                  activation = "relu",
                  loss = "mse", 
                  problem="regression",
                  optimizer ="gradient_descent",
-                 q=None):
+                 q=None, 
+                 model_dict=None):
         """
         Initialize network
         
@@ -56,37 +54,59 @@ class MLP():
         :param loss: loss function to be used(type: str)
         :param problem: regression, binary_classification, quantile (type: str)
         :param optimizer: optimizer to use (type: str)
+        :param model_dict: containing all necessary information to instantiate a model (type: dict)
         """
         
         self.print_rate = 100
-        self._activation = activation
-        self.dims = [X.shape[1]] + hidden_layers + [1]
+        
+        
+        if model_dict is None and X is None:
+            pass
+        else:
+            if model_dict is None:
+                # Create layers
+                self.dims = [X.shape[1]] + hidden_layers + [1]
+                self._activation = activation
+                self._loss_name = loss
+                self._problem_name = problem
+                self._optimizer_name = optimizer
+                self._q = q
+                self._model_dict = model_dict
 
-        # Create layers
-        self._build_architecture()
-        
-        # Losses
-        if loss == "mse":
-            self._loss = losses.MSE()
-        if loss == "logloss":
-            self._loss = losses.Logloss()
-        if loss == "quantile":
-            self._loss = losses.Quantile(q)
-        
-        # Output activation
-        if problem == "regression" : 
-            self._layers[-1].activation = activations.Linear()
-        if problem == "quantile" : 
-            self._layers[-1].activation = activations.Linear()
-        if problem == "binary_classification":
-            self._layers[-1].activation = activations.Sigmoid()
-        
-        # Set optimizer
-        if optimizer == "gradient_descent":
-            self._optimizer = optimizers.Gradient_descent()
-        if optimizer == "adam":
-            self._optimizer = optimizers.Adam()
-            self._layers = self._optimizer.initialize_parameters(self._layers)
+            else:
+                self._activation = model_dict["activation"]
+                self.dims = model_dict["dims"]
+                self._loss_name = model_dict["loss"]
+                self._problem_name = model_dict["problem"]
+                self._optimizer_name = model_dict["optimizer"]
+                self._q = model_dict["q"]
+                self._model_dict = model_dict
+            
+            self._build_architecture()
+
+            # Losses
+            if loss == "mse":
+                self._loss = losses.MSE()
+            if loss == "logloss":
+                self._loss = losses.Logloss()
+            if loss == "quantile":
+                self._loss = losses.Quantile(q)
+
+            # Output activation
+            if problem == "regression" : 
+                self._layers[-1].activation = activations.Linear()
+            if problem == "quantile" : 
+                self._layers[-1].activation = activations.Linear()
+            if problem == "binary_classification":
+                self._layers[-1].activation = activations.Sigmoid()
+
+            # Set optimizer
+            if optimizer == "gradient_descent":
+                self._optimizer = optimizers.Gradient_descent()
+            if optimizer == "adam":
+                self._optimizer = optimizers.Adam()
+                self._layers = self._optimizer.initialize_parameters(self._layers)
+                
         
     def _build_architecture(self):
         """
@@ -95,9 +115,20 @@ class MLP():
         """
         
         self._layers = []
-        for input_dim, output_dim in  zip(self.dims[:-1], self.dims[1:]):
-            self._layers.append(Dense(input_dim, output_dim, activation=self._activation))
+        if self._model_dict is None:
+            for input_dim, output_dim in  zip(self.dims[:-1], self.dims[1:]):
+                self._layers.append(Dense(input_dim, output_dim, activation=self._activation))
+        else:
+            for layer in self._model_dict["layers"]:
+                W = np.array(layer["W"])
+                b = np.array(layer["b"])
+                activation = layer["activation"]
+                dense = Dense(W.shape[0], W.shape[1],activation=activation)
+                dense.W = W
+                dense.b = b
+                self._layers.append(dense)
         self.n_layers = len(self._layers)
+        
         
     def _forward_prop(self, X, update=True):
         """
@@ -240,3 +271,56 @@ class MLP():
         current_loss = self._loss.forward(actual, prediction)
         current_loss = np.mean(current_loss)
         return current_loss
+    
+    
+    def _get_layers(self):
+        """
+        Return layer weights and activation name in a list of dicts
+        :return: list of layers (type: list[dict])
+        """
+        layers = []
+        for layer in self._layers:
+
+            layer_i  = {
+                "W" : layer.W.tolist(),
+                "b" : layer.b.tolist(),
+                "activation" : layer.activation.name}
+            layers.append(layer_i)
+
+        return layers
+
+    def return_model(self):
+        """
+        Returns model information as a json
+        :return: model info (type: dict)
+        """
+        model_dict = {
+            "loss" : self._loss_name,
+            "q" : self._q,
+            "problem" : self._problem_name,
+            "activation" : self._activation,
+            "optimizer" : self._optimizer_name,
+            "dims" : self.dims,
+            "layers" : self._get_layers()
+        }
+    
+        return model_dict
+    
+    def save(self, path):
+        """
+        Save model to json
+        
+        :param path: path to save model as json
+        """
+        model_dict = self.return_model()
+        model_utils.save_json(model_dict, path)
+    
+    def load(self, path):
+        """
+        Load model from json file
+        
+        :param path: path to json file containing model info
+        """
+        model_dict = model_utils.read_json(path)
+        self.__init__(model_dict=model_dict)
+        

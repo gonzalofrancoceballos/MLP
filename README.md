@@ -17,24 +17,24 @@ mlp = MLP(X, hidden_layers=[5,4,2], activation="tanh", optimizer="adam")
 #### Instantiate a binary classificaton  model
 
 ```python
-mlp = models.MLP(X, 
-                hidden_layers=[3,3,2], 
-                activation="swish", 
-                optimizer="adam", 
-                problem="binary_classification",
-                loss = "logloss")
+mlp = MLP(X, 
+          hidden_layers=[3,3,2], 
+          activation="swish", 
+          optimizer="adam", 
+          problem="binary_classification",
+          loss = "logloss")
 
 ```
 
 #### Instantiate a quantile regression  model
 
 ```python
-mlp = models.MLP(X,
-                 hidden_layers=[5,5,5],
-                 activation="tanh", optimizer="adam", 
-                 problem="quantile",
-                 loss="quantile",
-                 q=0.01)
+mlp = MLP(X,
+          hidden_layers=[5,5,5],
+          activation="tanh", optimizer="adam", 
+          problem="quantile",
+          loss="quantile",
+          q=0.01)
 ```
 
 #### Train on test, dev data
@@ -50,7 +50,16 @@ mlp.train(X,y,
 ```python
 predictions = mlp.predict(X_pred)
 ```            
-          
+
+#### Save and load a model
+```python
+mlp.save("model.json")
+
+mlp MLP()
+mlp.load("model.json")
+```      
+
+
 
 ## Authors
 

@@ -32,7 +32,12 @@ class Sigmoid():
     """
     Sigmoid activation function
     """
-    
+    def __init__(self):
+        """
+        Initialize object
+        """
+        self.name = "sigmoid"
+        
     def forward(self, x):
         """
         Forward propagation operation
@@ -53,7 +58,13 @@ class Swish():
     """
     Swish activation function
     """
-   
+    
+    def __init__(self):
+        """
+        Initialize object
+        """
+        self.name = "swish"
+        
     def _sigmoid_p(self, x):
         return (1-sigmoid(x)) * sigmoid(x)
     
@@ -77,7 +88,12 @@ class Relu():
     """
     ReLu activation function
     """
-    
+    def __init__(self):
+        """
+        Initialize object
+        """
+        self.name = "relu"
+        
     def forward(self, x):
         """
         Forward propagation operation
@@ -104,6 +120,7 @@ class Leaky_relu():
         :param m: slope of he function (type: float)
         """
         self.m = m
+        self.name = "leaky_relu"
         
     def forward(self, x):
         """
@@ -126,6 +143,12 @@ class Tanh():
     Tanh activation function
     """
     
+    def __init__(self):
+        """
+        Initialize object
+        """
+        self.name = "tanh"
+        
     def forward(self, x):
         """
         Forward propagation operation
@@ -147,6 +170,12 @@ class Linear():
     Linear activation function
     """
     
+    def __init__(self):
+        """
+        Initialize object
+        """
+        self.name = "linear"
+        
     def forward(self, x):
         """
         Forward propagation operation
