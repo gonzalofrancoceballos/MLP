@@ -55,7 +55,7 @@ predictions = mlp.predict(X_pred)
 ```python
 mlp.save("model.json")
 
-mlp MLP()
+mlp = MLP()
 mlp.load("model.json")
 ```      
 
