@@ -45,7 +45,8 @@ class MLP():
                  activation = "relu",
                  loss = "mse", 
                  problem="regression",
-                 optimizer ="gradient_descent"):
+                 optimizer ="gradient_descent",
+                 q=None):
         """
         Initialize network
         
@@ -69,6 +70,8 @@ class MLP():
             self._loss = losses.MSE()
         if loss == "logloss":
             self._loss = losses.Logloss()
+        if loss == "quantile":
+            self._loss = losses.Quantile(q)
         
         # Output activation
         if problem == "regression" : 

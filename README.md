@@ -8,10 +8,33 @@ This is a work-in-progress repository. Simple and light-weight implementation of
 The following lines showcase the use of this library to run a simple train-predict task
 
 
-#### Instantiate a new model
+#### Instantiate a regression  model
 
 ```python
 mlp = MLP(X, hidden_layers=[5,4,2], activation="tanh", optimizer="adam")
+```
+
+#### Instantiate a binary classificaton  model
+
+```python
+mlp = models.MLP(X, 
+                hidden_layers=[3,3,2], 
+                activation="swish", 
+                optimizer="adam", 
+                problem="binary_classification",
+                loss = "logloss")
+
+```
+
+#### Instantiate a quantile regression  model
+
+```python
+mlp = models.MLP(X,
+                 hidden_layers=[5,5,5],
+                 activation="tanh", optimizer="adam", 
+                 problem="quantile",
+                 loss="quantile",
+                 q=0.01)
 ```
 
 #### Train on test, dev data
@@ -19,8 +42,8 @@ mlp = MLP(X, hidden_layers=[5,4,2], activation="tanh", optimizer="adam")
 mlp.train(X,y,
           X_dev=X_dev, 
           y_dev=y_dev,
-          n_epoch=100,
-          n_stopping_rounds=30)
+          n_epoch=130,
+          batch_size=256)
 ```      
 
 #### Compute predictions on new data

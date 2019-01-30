@@ -57,7 +57,7 @@ class Logloss():
         """
         Compute Logloss error between targt and prediction
         :param actual: target vector (type: np.array)
-        :param actual: predictions vector (type: np.array)
+        :param prediction: predictions vector (type: np.array)
         :return: vector containing element-wise Logloss
         """
         
@@ -70,7 +70,7 @@ class Logloss():
         """
         Compute the derivative of Logloss error 
         :param actual: target vector (type: np.array)
-        :param actual: predictions vector (type: np.array)
+        :param prediction: predictions vector (type: np.array)
         :return: vector containing element-wise derivative of Logloss
         """
         
@@ -78,3 +78,43 @@ class Logloss():
         prediction = np.clip(prediction, self._eps, 1 - self._eps)
         
         return -(actual/prediction) + ((1-actual)/(1-prediction))
+
+
+class Quantile():
+    """
+    Class that implements Quantile Loss
+    """
+    def __init__(self, q):
+        """
+        Initialize quantile loss object
+        :param q: quantile for which we want to cumpute the loss (type: float)
+        """
+        self.q = q
+        
+    def forward(self,actual, prediction):
+        """
+        Compute quantile loss for an especific quantile
+        
+        :param actual: target vector (type: np.array)
+        :param prediction: predictions vector (type: np.array)
+        :return: vector containing element-wise derivative of Logloss
+        """
+        
+        e = (actual-prediction)
+        
+        return np.maximum(self.q*e, (self.q-1)*e)
+    
+    
+    def derivate(self, actual, prediction):
+        """
+        Compute the derivative of quantile loss
+        :param actual: target vector (type: np.array)
+        :param prediction: predictions vector (type: np.array)
+        :return: vector containing element-wise derivative of Logloss
+        """
+        
+        e = (actual-prediction)
+        q_loss =  np.where(e>0, -self.q, 1-self.q)
+        return q_loss
+        
+        
