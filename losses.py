@@ -46,6 +46,13 @@ class Logloss():
     """
     Class that implements Logloss Error
     """
+    def __init__(self):
+        """
+        Initialize logloss object
+        eps is a small number to avoid extreme values in predictions of 0 and 1
+        """
+        self._eps = 1e-15
+        
     def forward(self, actual, prediction):
         """
         Compute Logloss error between targt and prediction
@@ -53,7 +60,11 @@ class Logloss():
         :param actual: predictions vector (type: np.array)
         :return: vector containing element-wise Logloss
         """
-        return actual*np.log(prediction) + (1-actual)*np.log(1-prediction)
+        
+        # Clip prediction to avioid 0 and 1
+        prediction = np.clip(prediction, self._eps, 1 - self._eps)
+        
+        return -(actual*np.log(prediction) + (1-actual)*np.log(1-prediction))
     
     def derivate(self, actual, prediction):
         """
@@ -62,4 +73,8 @@ class Logloss():
         :param actual: predictions vector (type: np.array)
         :return: vector containing element-wise derivative of Logloss
         """
-        return (actual-prediction)/(prediction*(1-actual))
+        
+        # Clip prediction to avioid 0 and 1
+        prediction = np.clip(prediction, self._eps, 1 - self._eps)
+        
+        return -(actual/prediction) + ((1-actual)/(1-prediction))

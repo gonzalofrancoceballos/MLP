@@ -1,5 +1,13 @@
 import models
 import numpy as np
+import pandas as pd
+
+"""
+Several reproducible examples for MLP model
+"""
+
+
+## REGRESSION
 
 # Dummy function to create synthetic dataset
 def f(X):
@@ -37,10 +45,32 @@ mlp.train(X,y,
           n_epoch=100,
           n_stopping_rounds=30)
 
-
 # Run predict on new data
 predictions = mlp.predict(X_pred)
 
 # Evaluate model performance using the same metric it used to train
 performance = mlp._compute_loss(predictions,y_pred)
 print(f"Prediction loss: {performance}")
+
+
+## CLASSIFICATION
+
+# Get data
+iris = pd.read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data", header=None)
+feature_cols = ["v1", "v2", "v3","v4"]
+iris.columns = feature_cols +  ["class"]
+iris["target"] = np.where(iris["class"] == "Iris-setosa", 1, 0)
+X = iris[feature_cols].values
+y = iris["target"].values.reshape([-1,1])
+
+
+# Instantiating model object
+mlp = models.MLP(X, 
+                 hidden_layers=[3,3,2], 
+                 activation="swish", 
+                 optimizer="adam", 
+                 problem="binary_classification",
+                 loss = "logloss")
+
+# Model train (not usin dev this time)
+mlp.train(X,y, n_epoch=1000,learning_rate=0.01)
