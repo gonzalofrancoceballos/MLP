@@ -29,8 +29,8 @@ import optimizers
 import model_utils
 from data_processing import Batcher
 from layers import Dense
-
-
+        
+        
 # Model
 class MLP():
     """
@@ -44,7 +44,8 @@ class MLP():
                  problem="regression",
                  optimizer ="gradient_descent",
                  q=None, 
-                 model_dict=None):
+                 model_dict=None,
+                 logger = Dummy_Logger()):
         """
         Initialize network
         
@@ -57,8 +58,8 @@ class MLP():
         :param model_dict: containing all necessary information to instantiate a model (type: dict)
         """
         
-        self.print_rate = 100
-        
+        self.print_rate = 5
+        self._logger = logger
         
         if model_dict is None and X is None:
             pass
@@ -85,25 +86,25 @@ class MLP():
             self._build_architecture()
 
             # Losses
-            if loss == "mse":
+            if self._loss_name == "mse":
                 self._loss = losses.MSE()
-            if loss == "logloss":
+            if self._loss_name == "logloss":
                 self._loss = losses.Logloss()
-            if loss == "quantile":
-                self._loss = losses.Quantile(q)
+            if self._loss_name == "quantile":
+                self._loss = losses.Quantile(self._q)
 
             # Output activation
-            if problem == "regression" : 
+            if self._problem_name == "regression" : 
                 self._layers[-1].activation = activations.Linear()
-            if problem == "quantile" : 
+            if self._problem_name == "quantile" : 
                 self._layers[-1].activation = activations.Linear()
-            if problem == "binary_classification":
+            if self._problem_name == "binary_classification":
                 self._layers[-1].activation = activations.Sigmoid()
 
             # Set optimizer
-            if optimizer == "gradient_descent":
+            if self._optimizer_name == "gradient_descent":
                 self._optimizer = optimizers.Gradient_descent()
-            if optimizer == "adam":
+            if self._optimizer_name == "adam":
                 self._optimizer = optimizers.Adam()
                 self._layers = self._optimizer.initialize_parameters(self._layers)
                 
@@ -251,12 +252,12 @@ class MLP():
                 else:
                     early_stopping_counter += 1
                     
-                if verbose:
-                    print(f"epoch: {epoch} | train_loss: {np.mean(train_loss)} |  dev_loss: {dev_loss}") 
+                if verbose and (epoch%self.print_rate==0):
+                    self._logger.info(f"epoch: {epoch} | train_loss: {np.mean(train_loss)} |  dev_loss: {dev_loss}") 
                         
             else:
-                if verbose:
-                    print(f"epoch: {epoch} | train_loss: {np.mean(train_loss)}")
+                if verbose and (epoch%self.print_rate==0):
+                    self._logger.info(f"epoch: {epoch} | train_loss: {np.mean(train_loss)}")
                 
             epoch = epoch+1
 
@@ -323,4 +324,4 @@ class MLP():
         """
         model_dict = model_utils.read_json(path)
         self.__init__(model_dict=model_dict)
-        
+         
