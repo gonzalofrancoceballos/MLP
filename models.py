@@ -23,6 +23,8 @@ TODO:
 - Save train log
 - Multi-label clasification
 - Multi-level classification
+- Softmax activation
+- Keep trainlog
 """
 
 import numpy as np
@@ -70,10 +72,9 @@ class MLP():
         self._logger = logger
         
         if model_dict is None and X is None:
-            logger.info("Initializing empty MLP")
+            self._model_info = "Empty MLP"
         else:
             if model_dict is None:
-                # Create layers
                 self.dims = [X.shape[1]] + hidden_layers + [1]
                 self._activation = activation
                 self._loss_name = loss
@@ -81,6 +82,10 @@ class MLP():
                 self._optimizer_name = optimizer
                 self._q = q
                 self._model_dict = model_dict
+                self._model_info = (f"MLP {self._problem_name}" + 
+                                    f"\ndims: {self.dims}"+
+                                    f"\nloss: {self._loss_name}"+
+                                    f"\noptimizer: {self._optimizer_name}")
 
             else:
                 self._activation = model_dict["activation"]
@@ -90,16 +95,23 @@ class MLP():
                 self._optimizer_name = model_dict["optimizer"]
                 self._q = model_dict["q"]
                 self._model_dict = model_dict
-            
+                self._model_info = (f"MLP {self._problem_name}" + 
+                                    f"\ndims: {self.dims}"+
+                                    f"\nloss: {self._loss_name}"+
+                                    f"\noptimizer: {self._optimizer_name}")
+                
             self._build_architecture()
 
             # Losses
             if self._loss_name == "mse":
                 self._loss = losses.MSE()
+            if self._loss_name == "mae":
+                self._loss = losses.MAE()
             if self._loss_name == "logloss":
                 self._loss = losses.Logloss()
             if self._loss_name == "quantile":
                 self._loss = losses.Quantile(self._q)
+                self._model_info = self._model_info + f"\nq: {self._q}"
 
             # Output activation
             if self._problem_name == "regression" : 
@@ -116,10 +128,16 @@ class MLP():
                 self._optimizer = optimizers.Adam()
                 self._layers = self._optimizer.initialize_parameters(self._layers)
                 
-        
+    def __repr__(self):
+        return self._model_info
+    
+    def __str__(self):
+        return self._model_info
+
+    
     def _build_architecture(self):
         """
-        Build architecture of MLP. 
+        Build architecture of MLP
         Instantiates Dense layers inside of a list
         """
         
@@ -152,16 +170,6 @@ class MLP():
             
         return A
     
-    def predict(self, X):
-        """
-        Computes a forward pass and returns prediction
-        Note that this operation will not update Z and A of each weight
-        :param X: input matrix to the network (type: np.array)
-        :return: output of the network (type: np.array)
-        """
-        pred = self._forward_prop(X, update=False)
-        return pred
-            
     def _back_prop(self, X, y):
         """
         Computes back-propagation pass through the network
@@ -281,7 +289,16 @@ class MLP():
         current_loss = np.mean(current_loss)
         return current_loss
     
-    
+    def predict(self, X):
+        """
+        Computes a forward pass and returns prediction
+        Note that this operation will not update Z and A of each weight
+        :param X: input matrix to the network (type: np.array)
+        :return: output of the network (type: np.array)
+        """
+        pred = self._forward_prop(X, update=False)
+        return pred
+
     def _get_layers(self):
         """
         Return layer weights and activation name in a list of dicts
@@ -297,7 +314,7 @@ class MLP():
             layers.append(layer_i)
 
         return layers
-
+        
     def return_model(self):
         """
         Returns model information as a json

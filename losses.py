@@ -26,7 +26,7 @@ class MSE():
     """
     def forward(self, actual, prediction):
         """
-        Compute MSE error between targt and prediction
+        Compute MSE error between target and prediction
         :param actual: target vector (type: np.array)
         :param actual: predictions vector (type: np.array)
         :return: vector containing element-wise MSE 
@@ -41,6 +41,30 @@ class MSE():
         :return: vector containing element-wise derivative of MSE 
         """
         return prediction - actual
+    
+    
+class MAE():
+    """
+    Class that implements Mean Absolute Error
+    """
+    def forward(self, actual, prediction):
+        """
+        Compute MAE error between target and prediction
+        :param actual: target vector (type: np.array)
+        :param actual: predictions vector (type: np.array)
+        :return: vector containing element-wise MAE 
+        """
+        return np.abs(prediction-actual) 
+    
+    def derivate(self, actual, prediction):
+        """
+        Compute the derivative of MAE 
+        :param actual: target vector (type: np.array)
+        :param actual: predictions vector (type: np.array)
+        :return: vector containing element-wise derivative of MAE 
+        """
+        return np.where(prediction-actual>0, 1, -1)
+    
     
 class Logloss():
     """
