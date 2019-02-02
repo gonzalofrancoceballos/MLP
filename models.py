@@ -20,6 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 TODO:
 - Load/save model functionality (testing)
+- Save train log
+- Multi-label clasification
+- Multi-level classification
 """
 
 import numpy as np
@@ -45,7 +48,7 @@ class MLP():
                  optimizer ="gradient_descent",
                  q=None, 
                  model_dict=None,
-                 logger = Dummy_Logger()):
+                 logger = model_utils.Dummy_logger()):
         """
         Initialize network
         
@@ -55,14 +58,19 @@ class MLP():
         :param loss: loss function to be used(type: str)
         :param problem: regression, binary_classification, quantile (type: str)
         :param optimizer: optimizer to use (type: str)
-        :param model_dict: containing all necessary information to instantiate a model (type: dict)
+        :param q: for quantile regression problem, this is the quantile for which the model will fit.
+        values must be between 0 and 1, not included (type: float)
+        :param model_dict: python dictionary containing all necessary information to
+        instantiate an existing model (type: dict)
+        :param logger: logging object. If left as default, normal print 
+        function will be called inside of DummyLogger object (type: Logger object)
         """
         
         self.print_rate = 5
         self._logger = logger
         
         if model_dict is None and X is None:
-            pass
+            logger.info("Initializing empty MLP")
         else:
             if model_dict is None:
                 # Create layers

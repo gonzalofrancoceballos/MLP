@@ -31,7 +31,8 @@ mlp = MLP(X,
 ```python
 mlp = MLP(X,
           hidden_layers=[5,5,5],
-          activation="tanh", optimizer="adam", 
+          activation="tanh", 
+          optimizer="adam", 
           problem="quantile",
           loss="quantile",
           q=0.01)
