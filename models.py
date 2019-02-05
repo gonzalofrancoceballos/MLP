@@ -28,6 +28,7 @@ TODO:
 """
 
 import numpy as np
+import pandas as pd
 import activations
 import losses
 import optimizers
@@ -250,17 +251,22 @@ class MLP():
         early_stopping_counter = 0
         
         # Start train
-        while epoch <=self._n_epoch and early_stopping_counter<self._n_stopping_rounds:
+        self.train_log = []
+        self.dev_log = []
+        while epoch <=self._n_epoch and early_stopping_counter < self._n_stopping_rounds:
             train_loss = []
             self._batcher.reset()
             for batch_i in range(self._batcher.n_batches):
                 X_batch, y_batch = self._batcher.next()
                 self._train_step(X_batch, y_batch)
-                train_loss.append(self._compute_loss(self._layers[-1].A,y_batch))
+                loss_i = self._compute_loss(self._layers[-1].A,y_batch)
+                train_loss.append(loss_i)
+                self.train_log.append(np.array([epoch, batch_i, loss_i]))
                 
             if type(X_dev) == np.ndarray and type(y_dev) == np.ndarray:
                 dev_pred = self.predict(X_dev)
-                dev_loss = self._compute_loss(dev_pred,y_dev)
+                dev_loss = self._compute_loss(dev_pred, y_dev)
+                self.dev_log.append(np.array([epoch, dev_loss]))
                 
                 if best_loss > dev_loss:
                     early_stopping_counter = 0
@@ -274,9 +280,15 @@ class MLP():
             else:
                 if verbose and (epoch%self.print_rate==0):
                     self._logger.info(f"epoch: {epoch} | train_loss: {np.mean(train_loss)}")
-                
+            
             epoch = epoch+1
-
+        
+        self.train_log = np.vstack(self.train_log)
+        self.train_log = pd.DataFrame(self.train_log, columns=["epoch", "iter", "loss"])
+        if type(X_dev) == np.ndarray and type(y_dev) == np.ndarray:
+            self.dev_log = np.vstack(self.dev_log)
+            self.dev_log = pd.DataFrame(self.dev_log, columns=["epoch", "loss"])
+        
     def _compute_loss(self, actual, prediction):
         """
         Computes loss between prediction and target
