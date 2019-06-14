@@ -28,7 +28,8 @@ def sigmoid(x):
     """
     return 1. / (1. + np.exp(-x))
 
-class Sigmoid():
+
+class Sigmoid:
     """
     Sigmoid activation function
     """
@@ -54,7 +55,7 @@ class Sigmoid():
         """
         return (1-sigmoid(x)) * sigmoid(x)
 
-class Swish():
+class Swish:
     """
     Swish activation function
     """
@@ -84,7 +85,8 @@ class Swish():
         """
         return x*self._sigmoid_p(x) + sigmoid(x)
 
-class Relu():
+
+class Relu:
     """
     ReLu activation function
     """
@@ -110,7 +112,8 @@ class Relu():
         """
         return np.where(x>0, 1., 0.)
 
-class Leaky_relu():
+
+class Leaky_relu:
     """
     Leaky activation function
     """
@@ -137,8 +140,9 @@ class Leaky_relu():
         :return: result of the operation (type: np.array)
         """
         return np.where(x>0, 1., self.m)
-    
-class Tanh():
+
+
+class Tanh:
     """
     Tanh activation function
     """
@@ -165,7 +169,7 @@ class Tanh():
         """
         return 1-np.tanh(x)**2
     
-class Linear():
+class Linear:
     """
     Linear activation function
     """

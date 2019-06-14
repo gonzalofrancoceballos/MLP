@@ -20,14 +20,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import numpy as np
 
 
-class Gradient_descent():
+class GradientDescent:
     """
     Implements gradient descent optimizer
     """
     def __init__(self, learning_rate=0.001):
         """
         Initialize optimizer
-        :param learning rate: learning rate of each iteration (type: float)
+        :param learning_rate: learning rate of each iteration (type: float)
         """
         self.learning_rate = learning_rate
         
@@ -42,15 +42,16 @@ class Gradient_descent():
             layers[i].b = layers[i].b - self.learning_rate * layers[i].db
         
         return layers
-    
-class Adam():
+
+
+class Adam:
     """
     Implements Adam optimizer
     """
     def __init__(self, learning_rate=0.001):
         """
         Initialize optimizer
-        :param learning rate: learning rate of each iteration (type: float)
+        :param learning_rate: learning rate of each iteration (type: float)
         """
         self.learning_rate = learning_rate
         self.beta_1 = 0.9
@@ -66,14 +67,13 @@ class Adam():
         """
         for i, layer in enumerate(layers):
             adam = {
-                "mW" : np.zeros(layer.dW.shape),
-                "mb" : np.zeros(layer.db.shape),
-                "vW" : np.zeros(layer.dW.shape),
-                "vb" : np.zeros(layer.db.shape)}
+                "mW": np.zeros(layer.dW.shape),
+                "mb": np.zeros(layer.db.shape),
+                "vW": np.zeros(layer.dW.shape),
+                "vb": np.zeros(layer.db.shape)}
             layers[i].adam = adam
         return layers
 
-        
     def update_weights(self, layers):
         """
         Perform update rule
@@ -82,21 +82,21 @@ class Adam():
         """
         t = self.t
         for i, layer in enumerate(layers):            
-            adam  = {
-                "mW" : (self.beta_1*layer.adam["mW"] + (1-self.beta_1)*layer.dW),
-                "mb" : (self.beta_1*layer.adam["mb"] + (1-self.beta_1)*layer.db),
-                "vW" : (self.beta_2*layer.adam["vW"] + (1-self.beta_2)*layer.dW**2),
-                "vb" : (self.beta_2*layer.adam["vb"] + (1-self.beta_2)*layer.db**2)}
+            adam = {
+                "mW": (self.beta_1*layer.adam["mW"] + (1-self.beta_1)*layer.dW),
+                "mb": (self.beta_1*layer.adam["mb"] + (1-self.beta_1)*layer.db),
+                "vW": (self.beta_2*layer.adam["vW"] + (1-self.beta_2)*layer.dW**2),
+                "vb": (self.beta_2*layer.adam["vb"] + (1-self.beta_2)*layer.db**2)}
             
             layer.adam = adam
             
-            mW_corrected  = adam["mW"] / (1-(self.beta_1**t))
-            mb_corrected  = adam["mb"] / (1-(self.beta_1**t))
-            vW_corrected  = adam["vW"] / (1-(self.beta_2**t))
-            vb_corrected  = adam["vb"] / (1-(self.beta_2**t))
+            mw_corrected = adam["mW"] / (1-(self.beta_1**t))
+            mb_corrected = adam["mb"] / (1-(self.beta_1**t))
+            vw_corrected = adam["vW"] / (1-(self.beta_2**t))
+            vb_corrected = adam["vb"] / (1-(self.beta_2**t))
             
-            layer.W = layer.W - (self.learning_rate * mW_corrected/(np.sqrt(vW_corrected)+ self.epsilon))
-            layer.b = layer.b - (self.learning_rate * mb_corrected/(np.sqrt(vb_corrected)+ self.epsilon))
+            layer.W = layer.W - (self.learning_rate * mw_corrected/(np.sqrt(vw_corrected) + self.epsilon))
+            layer.b = layer.b - (self.learning_rate * mb_corrected/(np.sqrt(vb_corrected) + self.epsilon))
             
             layers[i] = layer
         self.t = t+1

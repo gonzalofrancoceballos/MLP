@@ -20,17 +20,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import numpy as np
 
 
-class Batcher():
-    '''
-    Batcher class. Given a list of np.arrays of same 0-dimension, returns a 
+class Batcher:
+    """
+    Batcher class. Given a list of np.arrays of same 0-dimension, returns a
     a list of batches for these elements
-    '''
+    """
+
     def __init__(self, data, batch_size, shuffle_on_reset=False):
-        '''
+        """
         :param data: list containing np.arrays (type: list[np.array])
         :param batch_size: size of each batch (type: int)
         :param shuffle_on_reset: flag to shuffle data (type: bool)
-        '''
+        """
         self.data = data
         self.batch_size = batch_size
         self.shuffle_on_reset = shuffle_on_reset
@@ -46,30 +47,30 @@ class Batcher():
         self.current = 0
         
     def shuffle(self):
-        '''
+        """
         Re-shufle the data
-        '''
+        """
         np.random.shuffle(self.I)
         
     def reset(self):
-        '''
+        """
         Reset iteration counter
-        '''
+        """
         if self.shuffle_on_reset:
             self.shuffle()
         self.current = 0
         
     def next(self):
-        '''
+        """
         Get next batch
         :return: list of np.arrays
-        '''
-        I_select = self.I[(self.current*self.batch_size):((self.current+1)*self.batch_size)]
+        """
+        i_select = self.I[(self.current*self.batch_size):((self.current+1)*self.batch_size)]
         batch = []
         for elem in self.data:
-            batch.append(elem[I_select])
+            batch.append(elem[i_select])
         
-        if(self.current<self.n_batches-1):
+        if self.current < (self.n_batches - 1):
             self.current = self.current+1
         else:
             self.reset()

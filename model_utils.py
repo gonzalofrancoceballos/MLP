@@ -1,4 +1,3 @@
-import numpy as np
 import json
 
 
@@ -24,7 +23,7 @@ def save_json(dict_object, file):
         json.dump(dict_object, fp)
 
         
-class Dummy_logger():
+class DummyLogger:
     """
     Dummy print function wrapper that is called like a logger
     """
@@ -38,4 +37,3 @@ class Dummy_logger():
         self.warning = print
         self.debug = print
         self.error = print
-        

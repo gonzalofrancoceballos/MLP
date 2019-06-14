@@ -23,14 +23,12 @@ import activations
 
 def glorot_initializer(input_dim, output_dim, activation):
     if activation == "relu":
-        return np.random.normal(0, size=[input_dim, output_dim])*  np.sqrt(2/input_dim)
+        return np.random.normal(0, size=[input_dim, output_dim]) * np.sqrt(2/input_dim)
     else:
-        return np.random.normal(0, size=[input_dim, output_dim])*  np.sqrt(1/input_dim)
-        
+        return np.random.normal(0, size=[input_dim, output_dim]) * np.sqrt(1/input_dim)
+
     
-    
-    
-class Dense():
+class Dense:
     """
     Class that implements a dense layer
     Z = vector_product(X,W) + b
@@ -40,7 +38,7 @@ class Dense():
     W: weights matrix of shape [input_dim, output_dim]
     b: bias vector of size [1, output_dim]
     """
-    def __init__(self, input_dim, output_dim, activation = "sigmoid"):
+    def __init__(self, input_dim, output_dim, activation="sigmoid"):
         """
         Initialize layer
         :param input_dim: input dimension of the layer (type: int)
@@ -92,4 +90,4 @@ class Dense():
         if update:
             self.Z = Z
             self.A = A
-        return A 
+        return A

@@ -7,8 +7,6 @@ Several reproducible examples for MLP model
 """
 
 
-## REGRESSION
-
 # Dummy function to create synthetic dataset
 def f(X):
     """
@@ -24,6 +22,8 @@ def f(X):
     
     return res
 
+
+# REGRESSION
 # Creating synthetic dataset
 N = 100000
 N_dev = 1000
@@ -36,10 +36,10 @@ y_pred = f(X_pred)
 
 
 # Instantiating model object
-mlp = models.MLP(X, hidden_layers=[5,4,2], activation="tanh", optimizer="adam")
+mlp = models.MLP(X, hidden_layers=[5, 4, 2], activation="tanh", optimizer="adam")
 
 # Model train
-mlp.train(X,y,
+mlp.train(X, y,
           X_dev=X_dev, 
           y_dev=y_dev,
           n_epoch=100,
@@ -49,60 +49,59 @@ mlp.train(X,y,
 predictions = mlp.predict(X_pred)
 
 # Evaluate model performance using the same metric it used to train
-performance = mlp._compute_loss(predictions,y_pred)
+performance = mlp._compute_loss(predictions, y_pred)
 print(f"Prediction loss: {performance}")
 
 
-## CLASSIFICATION
+# CLASSIFICATION
 
 # Get data
 iris = pd.read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data", header=None)
-feature_cols = ["v1", "v2", "v3","v4"]
-iris.columns = feature_cols +  ["class"]
+feature_cols = ["v1", "v2", "v3", "v4"]
+iris.columns = feature_cols + ["class"]
 iris["target"] = np.where(iris["class"] == "Iris-setosa", 1, 0)
 X = iris[feature_cols].values
-y = iris["target"].values.reshape([-1,1])
+y = iris["target"].values.reshape([-1, 1])
 
 
 # Instantiating model object
 mlp = models.MLP(X, 
-                 hidden_layers=[3,3,2], 
+                 hidden_layers=[3, 3, 2],
                  activation="swish", 
                  optimizer="adam", 
                  problem="binary_classification",
-                 loss = "logloss")
+                 loss="logloss")
 
 # Model train (not usin dev this time)
-mlp.train(X,y, n_epoch=1000,learning_rate=0.01)
+mlp.train(X, y, n_epoch=1000, learning_rate=0.01)
 
 
 # QUANTILE
 
 # Creating synthetic dataset
 N = 100000
-N_dev = 1000
-X = 100*(np.random.rand(N, 3) -0.5)
+X = 100 * (np.random.rand(N, 3) - 0.5)
 X_dev = np.random.rand(N, 3)
 X_pred = np.random.rand(N, 3)
 
 noise = (np.random.normal(size=N)-0.5)/5
-noise = noise.reshape([-1,1])
+noise = noise.reshape([-1, 1])
 
-#We need noise in the data for the quantile regression
+# We need noise in the data for the quantile regression
 y = f(X) * (1+noise)
 y_dev = f(X_dev)
 y_pred = f(X_pred)
 
 # Instantiating model object for quantile 1
 mlp_q1 = models.MLP(X,
-                    hidden_layers=[5,5,5],
+                    hidden_layers=[5, 5, 5],
                     activation="tanh", optimizer="adam", 
                     problem="quantile",
                     loss="quantile",
                     q=0.01)
 
 # Model train
-mlp_q1.train(X,y,
+mlp_q1.train(X, y,
              X_dev=X_dev, 
              y_dev=y_dev,
              n_epoch=100,
@@ -115,14 +114,14 @@ predictions_q1 = mlp_q1.predict(X_pred)
 print(f"Prediction average for quantile 1: {predictions_q1.mean()}")
 
 # Instantiating model object for quantile 99
-mlp_q99 = models.MLP(X, hidden_layers=[5,5,5],
-                 activation="tanh", optimizer="adam", 
-                 problem="quantile",
-                 loss="quantile",
-                 q=0.99)
+mlp_q99 = models.MLP(X, hidden_layers=[5, 5, 5],
+                     activation="tanh", optimizer="adam",
+                     problem="quantile",
+                     loss="quantile",
+                     q=0.99)
 
 # Model train
-mlp_q99.train(X,y,
+mlp_q99.train(X, y,
               X_dev=X_dev, 
               y_dev=y_dev,
               n_epoch=100,

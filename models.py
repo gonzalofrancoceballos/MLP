@@ -38,25 +38,25 @@ from layers import Dense
         
         
 # Model
-class MLP():
+class MLP:
     """
     Multi-layer perceptron
     """
-    def __init__(self, 
-                 X=None, 
-                 hidden_layers = [2,2], 
-                 activation = "relu",
-                 loss = "mse", 
+    def __init__(self,
+                 X=None,
+                 hidden_layers=[2,2],
+                 activation="relu",
+                 loss="mse",
                  problem="regression",
-                 optimizer ="gradient_descent",
-                 q=None, 
+                 optimizer="gradient_descent",
+                 q=None,
                  model_dict=None,
-                 logger = model_utils.Dummy_logger()):
+                 logger=model_utils.DummyLogger()):
         """
         Initialize network
         
         :param X: input data (type: np.array)
-        :param hidden layers: size of hidden layers (type: list[int])
+        :param hidden_layers: size of hidden layers (type: list[int])
         :param activation: activartion (type: str)
         :param loss: loss function to be used(type: str)
         :param problem: regression, binary_classification, quantile (type: str)
@@ -84,8 +84,8 @@ class MLP():
                 self._q = q
                 self._model_dict = model_dict
                 self._model_info = (f"MLP {self._problem_name}" + 
-                                    f"\ndims: {self.dims}"+
-                                    f"\nloss: {self._loss_name}"+
+                                    f"\ndims: {self.dims}" +
+                                    f"\nloss: {self._loss_name}" +
                                     f"\noptimizer: {self._optimizer_name}")
 
             else:
@@ -97,8 +97,8 @@ class MLP():
                 self._q = model_dict["q"]
                 self._model_dict = model_dict
                 self._model_info = (f"MLP {self._problem_name}" + 
-                                    f"\ndims: {self.dims}"+
-                                    f"\nloss: {self._loss_name}"+
+                                    f"\ndims: {self.dims}" +
+                                    f"\nloss: {self._loss_name}" +
                                     f"\noptimizer: {self._optimizer_name}")
                 
             self._build_architecture()
@@ -115,16 +115,16 @@ class MLP():
                 self._model_info = self._model_info + f"\nq: {self._q}"
 
             # Output activation
-            if self._problem_name == "regression" : 
+            if self._problem_name == "regression":
                 self._layers[-1].activation = activations.Linear()
-            if self._problem_name == "quantile" : 
+            if self._problem_name == "quantile":
                 self._layers[-1].activation = activations.Linear()
             if self._problem_name == "binary_classification":
                 self._layers[-1].activation = activations.Sigmoid()
 
             # Set optimizer
             if self._optimizer_name == "gradient_descent":
-                self._optimizer = optimizers.Gradient_descent()
+                self._optimizer = optimizers.GradientDescent()
             if self._optimizer_name == "adam":
                 self._optimizer = optimizers.Adam()
                 self._layers = self._optimizer.initialize_parameters(self._layers)
@@ -135,7 +135,6 @@ class MLP():
     def __str__(self):
         return self._model_info
 
-    
     def _build_architecture(self):
         """
         Build architecture of MLP
@@ -151,12 +150,11 @@ class MLP():
                 W = np.array(layer["W"])
                 b = np.array(layer["b"])
                 activation = layer["activation"]
-                dense = Dense(W.shape[0], W.shape[1],activation=activation)
+                dense = Dense(W.shape[0], W.shape[1], activation=activation)
                 dense.W = W
                 dense.b = b
                 self._layers.append(dense)
         self.n_layers = len(self._layers)
-        
         
     def _forward_prop(self, X, update=True):
         """
@@ -182,7 +180,7 @@ class MLP():
         for i in np.arange(len(self._layers))+1:
             # Compute deltas deltas 
             layer = self._layers[-i]
-            if i==1:
+            if i == 1:
                 delta = self._loss.derivate(y, layer.A) * layer.activation.derivate(layer.Z)
             else:
                 i_next = i-1
@@ -191,13 +189,13 @@ class MLP():
             self._layers[-i].delta = delta
             
             # Compute gradients
-            if i==self.n_layers:
+            if i == self.n_layers:
                 a_in = X
             else:
                 i_prev = i+1
                 a_in = self._layers[-i_prev].A
             delta_out = self._layers[-i].delta
-            self._layers[-i].db = delta_out.sum(axis=0).reshape([1,-1])
+            self._layers[-i].db = delta_out.sum(axis=0).reshape([1, -1])
             self._layers[-i].dW = np.matmul(a_in.T,  delta_out) 
             self._layers[-i].dW += self.reg_lambda * self._layers[-i].W
             
@@ -219,7 +217,6 @@ class MLP():
 
         # Update rule
         self._layers = self._optimizer.update_weights(self._layers)
-            
 
     def train(self, X, y, X_dev=None, y_dev=None,
               n_epoch=100, batch_size=128, n_stopping_rounds=10, 
@@ -230,7 +227,6 @@ class MLP():
         :param y: target vector (type: np.array)
         :param X_dev: development matrix for early stopping (type: np.array)
         :param y_dev: development target vector (type: np.array)
-        :param n_iter: number of train iterations (type: int)
         :param n_epoch: number of epochs (type: int)
         :param batch_size: batch size (type: int)
         :param n_stopping_rounds: number of iterations before early stopping (type: int)
@@ -253,7 +249,7 @@ class MLP():
         # Start train
         self.train_log = []
         self.dev_log = []
-        while epoch <=self._n_epoch and early_stopping_counter < self._n_stopping_rounds:
+        while epoch <= self._n_epoch and early_stopping_counter < self._n_stopping_rounds:
             train_loss = []
             self._batcher.reset()
             for batch_i in range(self._batcher.n_batches):
@@ -274,11 +270,11 @@ class MLP():
                 else:
                     early_stopping_counter += 1
                     
-                if verbose and (epoch%self.print_rate==0):
+                if verbose and (epoch%self.print_rate == 0):
                     self._logger.info(f"epoch: {epoch} | train_loss: {np.mean(train_loss)} |  dev_loss: {dev_loss}") 
                         
             else:
-                if verbose and (epoch%self.print_rate==0):
+                if verbose and (epoch%self.print_rate == 0):
                     self._logger.info(f"epoch: {epoch} | train_loss: {np.mean(train_loss)}")
             
             epoch = epoch+1
@@ -319,10 +315,10 @@ class MLP():
         layers = []
         for layer in self._layers:
 
-            layer_i  = {
-                "W" : layer.W.tolist(),
-                "b" : layer.b.tolist(),
-                "activation" : layer.activation.name}
+            layer_i = {
+                "W": layer.W.tolist(),
+                "b": layer.b.tolist(),
+                "activation": layer.activation.name}
             layers.append(layer_i)
 
         return layers
@@ -333,13 +329,13 @@ class MLP():
         :return: model info (type: dict)
         """
         model_dict = {
-            "loss" : self._loss_name,
-            "q" : self._q,
-            "problem" : self._problem_name,
-            "activation" : self._activation,
-            "optimizer" : self._optimizer_name,
-            "dims" : self.dims,
-            "layers" : self._get_layers()
+            "loss": self._loss_name,
+            "q": self._q,
+            "problem": self._problem_name,
+            "activation": self._activation,
+            "optimizer": self._optimizer_name,
+            "dims": self.dims,
+            "layers": self._get_layers()
         }
     
         return model_dict
@@ -361,4 +357,3 @@ class MLP():
         """
         model_dict = model_utils.read_json(path)
         self.__init__(model_dict=model_dict)
-         

@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import numpy as np
 
 
-class MSE():
+class MSE:
     """
     Class that implements Mean Squared Error
     """
@@ -28,7 +28,7 @@ class MSE():
         """
         Compute MSE error between target and prediction
         :param actual: target vector (type: np.array)
-        :param actual: predictions vector (type: np.array)
+        :param prediction: predictions vector (type: np.array)
         :return: vector containing element-wise MSE 
         """
         return 0.5*((prediction-actual)**2) 
@@ -37,13 +37,13 @@ class MSE():
         """
         Compute the derivative of MSE error 
         :param actual: target vector (type: np.array)
-        :param actual: predictions vector (type: np.array)
+        :param prediction: predictions vector (type: np.array)
         :return: vector containing element-wise derivative of MSE 
         """
         return prediction - actual
     
     
-class MAE():
+class MAE:
     """
     Class that implements Mean Absolute Error
     """
@@ -51,7 +51,7 @@ class MAE():
         """
         Compute MAE error between target and prediction
         :param actual: target vector (type: np.array)
-        :param actual: predictions vector (type: np.array)
+        :param prediction: predictions vector (type: np.array)
         :return: vector containing element-wise MAE 
         """
         return np.abs(prediction-actual) 
@@ -60,13 +60,13 @@ class MAE():
         """
         Compute the derivative of MAE 
         :param actual: target vector (type: np.array)
-        :param actual: predictions vector (type: np.array)
+        :param prediction: predictions vector (type: np.array)
         :return: vector containing element-wise derivative of MAE 
         """
         return np.where(prediction-actual>0, 1, -1)
     
     
-class Logloss():
+class Logloss:
     """
     Class that implements Logloss Error
     """
@@ -104,7 +104,7 @@ class Logloss():
         return -(actual/prediction) + ((1-actual)/(1-prediction))
 
 
-class Quantile():
+class Quantile:
     """
     Class that implements Quantile Loss
     """
@@ -115,7 +115,7 @@ class Quantile():
         """
         self.q = q
         
-    def forward(self,actual, prediction):
+    def forward(self, actual, prediction):
         """
         Compute quantile loss for an especific quantile
         
@@ -127,8 +127,7 @@ class Quantile():
         e = (actual-prediction)
         
         return np.maximum(self.q*e, (self.q-1)*e)
-    
-    
+
     def derivate(self, actual, prediction):
         """
         Compute the derivative of quantile loss
@@ -138,7 +137,5 @@ class Quantile():
         """
         
         e = (actual-prediction)
-        q_loss =  np.where(e>0, -self.q, 1-self.q)
+        q_loss = np.where(e > 0, -self.q, 1-self.q)
         return q_loss
-        
-        
