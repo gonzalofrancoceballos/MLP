@@ -18,17 +18,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import numpy as np
-import activations
+from initializers import Glorot
+from abc import abstractmethod
 
 
-def glorot_initializer(input_dim, output_dim, activation):
-    if activation == "relu":
-        return np.random.normal(0, size=[input_dim, output_dim]) * np.sqrt(2/input_dim)
-    else:
-        return np.random.normal(0, size=[input_dim, output_dim]) * np.sqrt(1/input_dim)
+class Layer:
+    """
+    Base class for layer
+    """
+    @abstractmethod
+    def __init__(self):
+        self.activation = None
+        self.input_dim = None
+        self.output_dim = None
 
-    
-class Dense:
+    @abstractmethod
+    def reset_layer(self, **kwargs):
+        pass
+
+    @abstractmethod
+    def forward(self, x: np.array) -> np.array:
+        pass
+
+
+class Dense(Layer):
     """
     Class that implements a dense layer
     Z = vector_product(X,W) + b
@@ -38,54 +51,55 @@ class Dense:
     W: weights matrix of shape [input_dim, output_dim]
     b: bias vector of size [1, output_dim]
     """
-    def __init__(self, input_dim, output_dim, activation="sigmoid"):
+
+    def __init__(self,
+                 units,
+                 activation,
+                 input_dim=None,
+                 kernel_initializer=Glorot(),
+                 initialize=False):
+
         """
         Initialize layer
-        :param input_dim: input dimension of the layer (type: int)
-        :param output_dim: output dimension of the layer (type: int)
+        When passed to
+
+        :param units: output size of the layer (type: int)
+        :param input_dim: input dimension of the layer. If none, they will be inferred
+        by the modelfrom the previous layer (type: int)
         :param activation: activation function of the layer (type: str)
+        :param initialize: flag to initialize weights (type: bool)
         """
         
-        self._activation_str = activation
+        self._activation_name = activation.name
+        self.activation = activation
+        self.input_dim = input_dim
+        self.output_dim = units
+        self.initializer = kernel_initializer
+
+        if initialize:
+            self.reset_layer()
         
-        if activation == "sigmoid": 
-            self.activation = activations.Sigmoid()
-        if activation == "relu": 
-            self.activation = activations.Relu()
-        if activation == "leaky_relu":
-            self.activation = activations.Leaky_relu()
-        if activation == "tanh": 
-            self.activation = activations.Tanh()
-        if activation == "linear": 
-            self.activation = activations.Linear()
-        if activation == "swish": 
-            self.activation = activations.Swish()
-            
-        self.reset_layer(input_dim, output_dim)
-        
-    def reset_layer(self, input_dim, output_dim, glorot=True):
+    def reset_layer(self):
         """
         Reset weights, bias and gradients of the layer
         """
-        if glorot:
-            self.W = glorot_initializer(input_dim, output_dim, self._activation_str)
-            self.b = np.zeros([1, output_dim])
-        else:
-            self.W = np.random.rand(input_dim, output_dim)
-            self.b = np.random.rand(1, output_dim)
-            
-        self.dW = np.zeros([input_dim, output_dim])
-        self.db = np.zeros([1, output_dim])
+        W, b, dW, db = self.initializer.initialize(self)
+        self.W = W
+        self.b = b
+        self.dW = dW
+        self.db = db
         
-    def forward(self, X, update=True):
+    def forward(self, x: np.array, update: bool = True) -> np.array:
         """
         Forward pass through layer
-        :param X: input matrix to the layer (type: np.array)
+
+        :param x: input matrix to the layer (type: np.array)
         :param update: flag to update outputs Z and A. These values need to be 
         cached during train to compute the back-propagation pass
+
         :return: result of forward operation (type: np.array)
         """
-        Z = np.matmul(X, self.W) + self.b
+        Z = np.matmul(x, self.W) + self.b
         A = self.activation.forward(Z)
         if update:
             self.Z = Z

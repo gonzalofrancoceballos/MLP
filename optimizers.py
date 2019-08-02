@@ -18,9 +18,27 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import numpy as np
+from abc import abstractmethod
 
 
-class GradientDescent:
+class Optimizer:
+    """
+    Base class for optimizer
+    """
+
+    def __init__(self):
+        self.name = "base_optimizer"
+
+    @abstractmethod
+    def update_weights(self, layers):
+        pass
+
+    @abstractmethod
+    def initialize_parameters(self, layers):
+        pass
+
+
+class GradientDescent(Optimizer):
     """
     Implements gradient descent optimizer
     """
@@ -30,7 +48,11 @@ class GradientDescent:
         :param learning_rate: learning rate of each iteration (type: float)
         """
         self.learning_rate = learning_rate
-        
+        self.name = "gradient_descent"
+
+    def initialize_parameters(self, layers):
+        return layers
+
     def update_weights(self, layers):
         """
         Perform update rule
@@ -44,7 +66,7 @@ class GradientDescent:
         return layers
 
 
-class Adam:
+class Adam(Optimizer):
     """
     Implements Adam optimizer
     """
@@ -53,6 +75,7 @@ class Adam:
         Initialize optimizer
         :param learning_rate: learning rate of each iteration (type: float)
         """
+        self.name = "adam"
         self.learning_rate = learning_rate
         self.beta_1 = 0.9
         self.beta_2 = 0.999
@@ -62,6 +85,7 @@ class Adam:
     def initialize_parameters(self, layers):
         """
         Initializes momemtum and velocity parameters for each layer of MLP
+
         :param layers: layers of the MLP (type: list[Dense()])
         :return: layers with initialized parameters (type: list[Dense()])
         """
@@ -74,7 +98,7 @@ class Adam:
             layers[i].adam = adam
         return layers
 
-    def update_weights(self, layers):
+    def update_weights(self, layers: list) -> list:
         """
         Perform update rule
         :param layers: layers of the MLP to update (type: list[Dense()])

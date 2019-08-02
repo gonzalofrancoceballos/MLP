@@ -17,19 +17,28 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
+from abc import abstractmethod
+from model_utils import sigmoid
 import numpy as np
 
 
-def sigmoid(x):
+class Activation:
     """
-    Sigmoid function
-    :param x: input matrix (type:np.array)
-    :output: result of applying sigmoid functin element-wise
+    Base class for activation function of a layer
     """
-    return 1. / (1. + np.exp(-x))
+    def __init__(self):
+        self.name = "base_activation"
+
+    @abstractmethod
+    def forward(self, x):
+        pass
+
+    @abstractmethod
+    def derivate(self, x):
+        pass
 
 
-class Sigmoid:
+class Sigmoid(Activation):
     """
     Sigmoid activation function
     """
@@ -38,7 +47,7 @@ class Sigmoid:
         Initialize object
         """
         self.name = "sigmoid"
-        
+
     def forward(self, x):
         """
         Forward propagation operation
@@ -46,7 +55,7 @@ class Sigmoid:
         :return: result of the operation (type: np.array)
         """
         return sigmoid(x)
-        
+
     def derivate(self, x):
         """
         Derivative of the activation function at each point of the input tensor
@@ -55,18 +64,19 @@ class Sigmoid:
         """
         return (1-sigmoid(x)) * sigmoid(x)
 
-class Swish:
+
+class Swish(Activation):
     """
     Swish activation function
     """
-    
     def __init__(self):
         """
         Initialize object
         """
         self.name = "swish"
-        
-    def _sigmoid_p(self, x):
+
+    @staticmethod
+    def _sigmoid_p(x):
         return (1-sigmoid(x)) * sigmoid(x)
     
     def forward(self, x):
@@ -86,7 +96,7 @@ class Swish:
         return x*self._sigmoid_p(x) + sigmoid(x)
 
 
-class Relu:
+class Relu(Activation):
     """
     ReLu activation function
     """
@@ -113,7 +123,7 @@ class Relu:
         return np.where(x>0, 1., 0.)
 
 
-class Leaky_relu:
+class LeakyRelu(Activation):
     """
     Leaky activation function
     """
@@ -142,7 +152,7 @@ class Leaky_relu:
         return np.where(x>0, 1., self.m)
 
 
-class Tanh:
+class Tanh(Activation):
     """
     Tanh activation function
     """
@@ -169,7 +179,7 @@ class Tanh:
         """
         return 1-np.tanh(x)**2
     
-class Linear:
+class Linear(Activation):
     """
     Linear activation function
     """

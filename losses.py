@@ -18,13 +18,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import numpy as np
+from abc import abstractmethod
 
 
-class MSE:
+class Loss:
+    """
+    Base class for loss function for prediction error
+    """
+    def __init__(self):
+        self.name = "base"
+
+    @abstractmethod
+    def forward(self, actual: np.array, prediction: np.array) -> np.array:
+        pass
+
+    @abstractmethod
+    def derivate(self, actual: np.array, prediction: np.array) -> np.array:
+        pass
+
+
+class MSE(Loss):
     """
     Class that implements Mean Squared Error
     """
-    def forward(self, actual, prediction):
+    def __init__(self):
+        self.name = "mse"
+
+    def forward(self, actual: np.array, prediction: np.array) -> np.array:
         """
         Compute MSE error between target and prediction
         :param actual: target vector (type: np.array)
@@ -33,7 +53,7 @@ class MSE:
         """
         return 0.5*((prediction-actual)**2) 
     
-    def derivate(self, actual, prediction):
+    def derivate(self, actual: np.array, prediction: np.array) -> np.array:
         """
         Compute the derivative of MSE error 
         :param actual: target vector (type: np.array)
@@ -43,11 +63,15 @@ class MSE:
         return prediction - actual
     
     
-class MAE:
+class MAE(Loss):
     """
     Class that implements Mean Absolute Error
     """
-    def forward(self, actual, prediction):
+
+    def __init__(self):
+        self.name = "mae"
+
+    def forward(self, actual: np.array, prediction: np.array) -> np.array:
         """
         Compute MAE error between target and prediction
         :param actual: target vector (type: np.array)
@@ -56,7 +80,7 @@ class MAE:
         """
         return np.abs(prediction-actual) 
     
-    def derivate(self, actual, prediction):
+    def derivate(self, actual: np.array, prediction: np.array) -> np.array:
         """
         Compute the derivative of MAE 
         :param actual: target vector (type: np.array)
@@ -66,7 +90,7 @@ class MAE:
         return np.where(prediction-actual>0, 1, -1)
     
     
-class Logloss:
+class Logloss(Loss):
     """
     Class that implements Logloss Error
     """
@@ -75,9 +99,10 @@ class Logloss:
         Initialize logloss object
         eps is a small number to avoid extreme values in predictions of 0 and 1
         """
+        self.name = "logloss"
         self._eps = 1e-15
         
-    def forward(self, actual, prediction):
+    def forward(self, actual: np.array, prediction: np.array) -> np.array:
         """
         Compute Logloss error between targt and prediction
         :param actual: target vector (type: np.array)
@@ -90,7 +115,7 @@ class Logloss:
         
         return -(actual*np.log(prediction) + (1-actual)*np.log(1-prediction))
     
-    def derivate(self, actual, prediction):
+    def derivate(self, actual: np.array, prediction: np.array) -> np.array:
         """
         Compute the derivative of Logloss error 
         :param actual: target vector (type: np.array)
@@ -104,18 +129,19 @@ class Logloss:
         return -(actual/prediction) + ((1-actual)/(1-prediction))
 
 
-class Quantile:
+class Quantile(Loss):
     """
     Class that implements Quantile Loss
     """
-    def __init__(self, q):
+    def __init__(self, q: float = 0.5):
         """
         Initialize quantile loss object
         :param q: quantile for which we want to cumpute the loss (type: float)
         """
+        self.name = "quantile"
         self.q = q
         
-    def forward(self, actual, prediction):
+    def forward(self, actual: np.array, prediction: np.array) -> np.array:
         """
         Compute quantile loss for an especific quantile
         
@@ -128,7 +154,7 @@ class Quantile:
         
         return np.maximum(self.q*e, (self.q-1)*e)
 
-    def derivate(self, actual, prediction):
+    def derivate(self, actual: np.array, prediction: np.array) -> np.array:
         """
         Compute the derivative of quantile loss
         :param actual: target vector (type: np.array)

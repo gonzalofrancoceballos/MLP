@@ -1,4 +1,14 @@
+import numpy as np
 import json
+
+
+def sigmoid(x):
+    """
+    Sigmoid function
+    :param x: input matrix (type:np.array)
+    :output: result of applying sigmoid functin element-wise
+    """
+    return 1. / (1. + np.exp(-x))
 
 
 def read_json(file):
