@@ -25,9 +25,6 @@ class Loss:
     """
     Base class for loss function for prediction error
     """
-    def __init__(self):
-        self.name = "base"
-
     @abstractmethod
     def forward(self, actual: np.array, prediction: np.array) -> np.array:
         pass
@@ -42,7 +39,7 @@ class MSE(Loss):
     Class that implements Mean Squared Error
     """
     def __init__(self):
-        self.name = "mse"
+        self.type = "mse"
 
     def forward(self, actual: np.array, prediction: np.array) -> np.array:
         """
@@ -69,7 +66,7 @@ class MAE(Loss):
     """
 
     def __init__(self):
-        self.name = "mae"
+        self.type = "mae"
 
     def forward(self, actual: np.array, prediction: np.array) -> np.array:
         """
@@ -87,7 +84,7 @@ class MAE(Loss):
         :param prediction: predictions vector (type: np.array)
         :return: vector containing element-wise derivative of MAE 
         """
-        return np.where(prediction-actual>0, 1, -1)
+        return np.where(prediction-actual > 0, 1, -1)
     
     
 class Logloss(Loss):
@@ -99,7 +96,7 @@ class Logloss(Loss):
         Initialize logloss object
         eps is a small number to avoid extreme values in predictions of 0 and 1
         """
-        self.name = "logloss"
+        self.type = "logloss"
         self._eps = 1e-15
         
     def forward(self, actual: np.array, prediction: np.array) -> np.array:
@@ -138,7 +135,7 @@ class Quantile(Loss):
         Initialize quantile loss object
         :param q: quantile for which we want to cumpute the loss (type: float)
         """
-        self.name = "quantile"
+        self.type = "quantile"
         self.q = q
         
     def forward(self, actual: np.array, prediction: np.array) -> np.array:

@@ -25,10 +25,6 @@ class Optimizer:
     """
     Base class for optimizer
     """
-
-    def __init__(self):
-        self.name = "base_optimizer"
-
     @abstractmethod
     def update_weights(self, layers):
         pass
@@ -48,7 +44,7 @@ class GradientDescent(Optimizer):
         :param learning_rate: learning rate of each iteration (type: float)
         """
         self.learning_rate = learning_rate
-        self.name = "gradient_descent"
+        self.type = "gradient_descent"
 
     def initialize_parameters(self, layers):
         return layers
@@ -75,7 +71,7 @@ class Adam(Optimizer):
         Initialize optimizer
         :param learning_rate: learning rate of each iteration (type: float)
         """
-        self.name = "adam"
+        self.type = "adam"
         self.learning_rate = learning_rate
         self.beta_1 = 0.9
         self.beta_2 = 0.999

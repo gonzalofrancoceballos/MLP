@@ -26,9 +26,6 @@ class Activation:
     """
     Base class for activation function of a layer
     """
-    def __init__(self):
-        self.name = "base_activation"
-
     @abstractmethod
     def forward(self, x):
         pass
@@ -46,7 +43,7 @@ class Sigmoid(Activation):
         """
         Initialize object
         """
-        self.name = "sigmoid"
+        self.type = "sigmoid"
 
     def forward(self, x):
         """
@@ -73,7 +70,7 @@ class Swish(Activation):
         """
         Initialize object
         """
-        self.name = "swish"
+        self.type = "swish"
 
     @staticmethod
     def _sigmoid_p(x):
@@ -104,7 +101,7 @@ class Relu(Activation):
         """
         Initialize object
         """
-        self.name = "relu"
+        self.type = "relu"
         
     def forward(self, x):
         """
@@ -112,7 +109,7 @@ class Relu(Activation):
         :param x: tensor apply operation element-wise (type: np.array)
         :return: result of the operation (type: np.array)
         """
-        return np.where(x>0, x, 0.)
+        return np.where(x > 0, x, 0.)
     
     def derivate(self, x):
         """
@@ -120,7 +117,7 @@ class Relu(Activation):
         :param x: tensor apply operation element-wise (type: np.array)
         :return: result of the operation (type: np.array)
         """
-        return np.where(x>0, 1., 0.)
+        return np.where(x > 0, 1., 0.)
 
 
 class LeakyRelu(Activation):
@@ -133,7 +130,7 @@ class LeakyRelu(Activation):
         :param m: slope of he function (type: float)
         """
         self.m = m
-        self.name = "leaky_relu"
+        self.type = "leaky_relu"
         
     def forward(self, x):
         """
@@ -141,7 +138,7 @@ class LeakyRelu(Activation):
         :param x: tensor apply operation element-wise (type: np.array)
         :return: result of the operation (type: np.array)
         """
-        return np.where(x>0, x, self.m*x)
+        return np.where(x > 0, x, self.m*x)
     
     def derivate(self, x):
         """
@@ -149,7 +146,7 @@ class LeakyRelu(Activation):
         :param x: tensor apply operation element-wise (type: np.array)
         :return: result of the operation (type: np.array)
         """
-        return np.where(x>0, 1., self.m)
+        return np.where(x > 0, 1., self.m)
 
 
 class Tanh(Activation):
@@ -161,7 +158,7 @@ class Tanh(Activation):
         """
         Initialize object
         """
-        self.name = "tanh"
+        self.type = "tanh"
         
     def forward(self, x):
         """
@@ -178,7 +175,8 @@ class Tanh(Activation):
         :return: result of the operation (type: np.array)
         """
         return 1-np.tanh(x)**2
-    
+
+
 class Linear(Activation):
     """
     Linear activation function
@@ -188,7 +186,7 @@ class Linear(Activation):
         """
         Initialize object
         """
-        self.name = "linear"
+        self.type = "linear"
         
     def forward(self, x):
         """

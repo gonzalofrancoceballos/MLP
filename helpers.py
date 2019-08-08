@@ -22,11 +22,11 @@ import losses
 import optimizers
 
 
-def assign_activation(name: str) -> activations.Activation:
+def assign_activation(type: str) -> activations.Activation:
     """
-    Returns actiavtion function given name
+    Returns actiavtion function given type
 
-    :param name: name of activation funciton (type: str)
+    :param type: type of activation funciton (type: str)
 
     :return: actiavtion function (type: Activation)
     """
@@ -39,14 +39,14 @@ def assign_activation(name: str) -> activations.Activation:
                "linear": activations.Linear()
                }
 
-    return options[name]
+    return options[type]
 
 
-def assign_loss(name: str) -> losses.Loss:
+def assign_loss(type: str) -> losses.Loss:
     """
-    Returns loss function given name
+    Returns loss function given type
 
-    :param name: name of loss funciton (type: str)
+    :param type: type of loss funciton (type: str)
 
     :return: loss function (type: Loss)
     """
@@ -57,14 +57,14 @@ def assign_loss(name: str) -> losses.Loss:
                "quantile": losses.Quantile()
                }
 
-    return options[name]
+    return options[type]
 
 
-def assign_optimizer(name: str) -> optimizers.Optimizer:
+def assign_optimizer(type: str) -> optimizers.Optimizer:
     """
-    Returns optimizer given name
+    Returns optimizer given type
 
-    :param name: name of optimizer (type: str)
+    :param type: type of optimizer (type: str)
 
     :return: optimizer object (type: Optimizer )
     """
@@ -72,4 +72,4 @@ def assign_optimizer(name: str) -> optimizers.Optimizer:
     options = {"gradient_descent": optimizers.GradientDescent(),
                "adam": optimizers.Adam()}
 
-    return options[name]
+    return options[type]

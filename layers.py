@@ -20,6 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import numpy as np
 from initializers import Glorot
 from abc import abstractmethod
+from helpers import assign_activation
 
 
 class Layer:
@@ -27,17 +28,19 @@ class Layer:
     Base class for layer
     """
     @abstractmethod
-    def __init__(self):
-        self.activation = None
-        self.input_dim = None
-        self.output_dim = None
-
-    @abstractmethod
     def reset_layer(self, **kwargs):
         pass
 
     @abstractmethod
     def forward(self, x: np.array) -> np.array:
+        pass
+
+    @abstractmethod
+    def to_dict(self):
+        pass
+
+    @abstractmethod
+    def _from_dict(self, layer_dict: dict):
         pass
 
 
@@ -53,15 +56,15 @@ class Dense(Layer):
     """
 
     def __init__(self,
-                 units,
-                 activation,
+                 units=None,
+                 activation=None,
                  input_dim=None,
                  kernel_initializer=Glorot(),
-                 initialize=False):
+                 initialize=False,
+                 layer_dict=None):
 
         """
         Initialize layer
-        When passed to
 
         :param units: output size of the layer (type: int)
         :param input_dim: input dimension of the layer. If none, they will be inferred
@@ -69,16 +72,30 @@ class Dense(Layer):
         :param activation: activation function of the layer (type: str)
         :param initialize: flag to initialize weights (type: bool)
         """
-        
-        self._activation_name = activation.name
-        self.activation = activation
-        self.input_dim = input_dim
-        self.output_dim = units
-        self.initializer = kernel_initializer
+
+        self.W = None
+        self.b = None
+        if layer_dict is not None:
+            self._from_dict(layer_dict)
+        elif units is None or activation is None:
+            raise AttributeError("It is necessary to especify units and activation")
+        else:
+            self.type = "dense"
+            self._activation_type = activation.type
+            self.activation = activation
+            self.input_dim = input_dim
+            self.output_dim = units
+            self.initializer = kernel_initializer
 
         if initialize:
             self.reset_layer()
-        
+
+    def __repr__(self):
+        return "[{}|{}] shape: {}\n".format(self.type, self.activation.type, self._get_shape())
+
+    def __str__(self):
+        return "[{}|{}] shape: {}\n".format(self.type, self.activation.type, self._get_shape())
+
     def reset_layer(self):
         """
         Reset weights, bias and gradients of the layer
@@ -88,7 +105,7 @@ class Dense(Layer):
         self.b = b
         self.dW = dW
         self.db = db
-        
+
     def forward(self, x: np.array, update: bool = True) -> np.array:
         """
         Forward pass through layer
@@ -105,3 +122,30 @@ class Dense(Layer):
             self.Z = Z
             self.A = A
         return A
+
+    def to_dict(self):
+        layer_dict = {
+            "type": self.type,
+            "W": self.W.tolist(),
+            "b": self.b.tolist(),
+            "activation": self.activation.type}
+
+        return layer_dict
+
+    def _from_dict(self, layer_dict):
+        """
+        Populates weights from dict
+
+        :param layer_dict:
+        :return:
+        """
+        self.type = layer_dict["type"]
+        self.W = np.array(layer_dict["W"])
+        self.b = np.array(layer_dict["b"])
+        self.activation = assign_activation(layer_dict["activation"])
+
+    def _get_shape(self):
+        if self.W is None:
+            return None
+        else:
+            return self.W.shape

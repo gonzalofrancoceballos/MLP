@@ -8,55 +8,55 @@ This is a work-in-progress repository. Simple and light-weight implementation of
 The following lines showcase the use of this library to run a simple train-predict task
 
 
-#### Instantiate a regression  model
+#### Instantiate a new empty model
 
 ```python
-mlp = MLP(X, hidden_layers=[5,4,2], activation="tanh", optimizer="adam")
+from models import BasicMLP
+model = BasicMLP()
 ```
 
-#### Instantiate a binary classificaton  model
+#### Add layers
 
 ```python
-mlp = MLP(X, 
-          hidden_layers=[3,3,2], 
-          activation="swish", 
-          optimizer="adam", 
-          problem="binary_classification",
-          loss = "logloss")
+from layers import Dense
+from activations import Sigmoid, Relu
+n_features = 10
+model.add(Dense(units=32, activation=Relu(), input_dim=n_features))
+model.add(Dense(units=64, activation=Relu()))
+model.add(Dense(units=8, activation=Relu()))
+model.add(Dense(units=1, activation=Sigmoid()))
 
 ```
 
-#### Instantiate a quantile regression  model
+#### Compile model
 
 ```python
-mlp = MLP(X,
-          hidden_layers=[5,5,5],
-          activation="tanh", 
-          optimizer="adam", 
-          problem="quantile",
-          loss="quantile",
-          q=0.01)
+model.compile()
 ```
 
-#### Train on test, dev data
+#### Train a quantile model
 ```python
-mlp.train(X,y,
-          X_dev=X_dev, 
-          y_dev=y_dev,
-          n_epoch=130,
-          batch_size=256)
+from losses import Quantile
+params = {"n_epoch": 1000}
+loss = Quantile(0.5)
+model.train(loss, [X, y], params=params)
 ```      
 
-#### Compute predictions on new data
+#### Train using train funciton
 ```python
-predictions = mlp.predict(X_pred)
+#### Train a quantile model
+from train import ModelTrain
+params = {"n_epoch": 1000}
+trainer = ModelTrain(params)
+loss = Quantile(0.5)
+
+trainer.train(model, loss, [X, y])
 ```            
 
 #### Save and load a model
 ```python
-mlp.save("model.json")
-
-mlp = MLP()
+model.save("model.json")
+mlp = BasicMLP()
 mlp.load("model.json")
 ```      
 

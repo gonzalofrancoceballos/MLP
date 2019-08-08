@@ -23,7 +23,6 @@ import pandas as pd
 from data_processing import Batcher
 from losses import Loss
 from optimizers import Optimizer, Adam
-from models import Model
 
 
 class ModelTrain:
@@ -42,7 +41,7 @@ class ModelTrain:
         self._optimizer = None
 
     def train(self,
-              model: Model,
+              model,
               loss: Loss,
               train_data: list,
               optimizer: Optimizer = Adam(),
@@ -52,7 +51,6 @@ class ModelTrain:
         Run several train steps
 
         :param model: model to uptimize on (type: Model)
-        :loss function object: (type: Loss)
         :param loss: loss function object (type: Loss)
         :param train_data: train dataset containing x,y pair (type: list[np.array])
         :param optimizer: optimizer to use in train (type: Optimizer)
@@ -114,7 +112,8 @@ class ModelTrain:
             model.dev_log = np.vstack(model.dev_log)
             model.dev_log = pd.DataFrame(model.dev_log, columns=["epoch", "loss"])
 
-    def _train_step(self, model: Model,
+    def _train_step(self,
+                    model,
                     x: np.array,
                     y: np.array,
                     loss: Loss,

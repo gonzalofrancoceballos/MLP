@@ -19,9 +19,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
 from abc import abstractmethod
+
+import model_utils
 from layers import Layer, Dense
 from losses import Loss
-import model_utils
 from train import ModelTrain
 from optimizers import Adam
 
@@ -41,9 +42,6 @@ class Model:
     """
     Base class for a model
     """
-    def __init__(self):
-        self.layers = []
-
     @abstractmethod
     def predict(self, x: np.array) -> np.array:
         pass
@@ -95,6 +93,26 @@ class BasicMLP(Model):
         self._trainer = None
         if self._model_dict is not None:
             self._build_architecture_from_dict()
+
+    def __repr__(self):
+        if self.layers:
+            repr_str = "SimpleMLP model:\n"
+            for layer in self.layers:
+                repr_str = repr_str + str(layer)
+
+            return repr_str
+        else:
+            return "Empty SimpleMLP model"
+
+    def __str__(self):
+        if self.layers:
+            repr_str = ""
+            for layer in self.layers:
+                repr_str = repr_str + str(layer)
+
+            return repr_str
+        else:
+            return "Empty SimpleMLP model"
 
     def add(self, layer: Layer):
         """
@@ -153,7 +171,7 @@ class BasicMLP(Model):
     def back_prop(self, x, y, loss, reg_lambda=0.01):
         """
         Computes back-propagation pass through the network
-        It retrieves output of the final layer, self._layers[-1].A, and back-propagates
+        It retrieves output of the final layer, self.layers[-1].A, and back-propagates
         its error through the layers of the network, computing and updating its gradients
 
         :param x: input matrix to the network (type: np.array)
@@ -162,26 +180,24 @@ class BasicMLP(Model):
         :param reg_lambda: regularizartion factor (type: float)
         """
 
-        for i in np.arange(len(self.layers)) + 1:
-            # Compute deltas deltas
-            layer = self.layers[-i]
-            if i == 1:
+        for i, layer in enumerate(reversed(self.layers)):
+            # Compute deltas
+            if i == 0:
                 delta = loss.derivate(y, layer.A) * layer.activation.derivate(layer.Z)
             else:
-                i_next = i - 1
-                layer_next = self.layers[-i_next]
+                layer_next = self.layers[-i]
                 delta = np.matmul(layer_next.delta, layer_next.W.T) * layer.activation.derivate(layer.Z)
-            self.layers[-i].delta = delta
+            layer.delta = delta
+
             # Compute gradients
-            if i == self.n_layers:
+            if i == self.n_layers - 1:
                 a_in = x
             else:
-                i_prev = i + 1
-                a_in = self.layers[-i_prev].A
-            delta_out = self.layers[-i].delta
-            self.layers[-i].db = delta_out.sum(axis=0).reshape([1, -1])
-            self.layers[-i].dW = np.matmul(a_in.T, delta_out)
-            self.layers[-i].dW += reg_lambda * self.layers[-i].W
+                a_in = layer.A
+            delta_out = layer.delta
+            layer.db = delta_out.sum(axis=0).reshape([1, -1])
+            layer.dW = np.matmul(a_in.T, delta_out)
+            layer.dW += reg_lambda * layer.W
 
     def save(self, path: str):
         """
@@ -208,13 +224,8 @@ class BasicMLP(Model):
         """
 
         self.layers = []
-        for layer in self._model_dict["layers"]:
-            W = np.array(layer["W"])
-            b = np.array(layer["b"])
-            activation = layer["activation"]
-            dense = Dense(W.shape[0], W.shape[1], activation=activation)
-            dense.W = W
-            dense.b = b
+        for layer_dict in self._model_dict["layers"]:
+            dense = Dense(layer_dict=layer_dict)
             self.layers.append(dense)
         self.n_layers = len(self.layers)
 
@@ -226,22 +237,19 @@ class BasicMLP(Model):
         """
 
         model_dict = {
-            "layers": self._get_layers()}
+            "layers": self._get_layers()
+        }
 
         return model_dict
 
     def _get_layers(self):
         """
-        Return layer weights and activation name in a list of dicts
+        Return layer weights and activation type in a list of dicts
         :return: list of layers (type: list[dict])
         """
         layers = []
         for layer in self.layers:
-
-            layer_i = {
-                "W": layer.W.tolist(),
-                "b": layer.b.tolist(),
-                "activation": layer.activation.name}
+            layer_i = layer.to_dict()
             layers.append(layer_i)
 
         return layers
