@@ -37,9 +37,14 @@ model.compile()
 #### Train a quantile model
 ```python
 from losses import Quantile
-params = {"n_epoch": 1000}
+params = {
+    "learning_rate": 0.001, 
+    "n_epoch": 100,
+    "print_rate": 10
+    }
+
 loss = Quantile(0.5)
-model.train(loss, [X, y], params=params)
+model.train(loss, train_data=[X, y], params=params)
 ```      
 
 #### Train using train funciton
@@ -50,7 +55,7 @@ params = {"n_epoch": 1000}
 trainer = ModelTrain(params)
 loss = Quantile(0.5)
 
-trainer.train(model, loss, [X, y])
+trainer.train(model, loss=loss, train_data=[X, y])
 ```            
 
 #### Save and load a model
