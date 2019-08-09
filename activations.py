@@ -17,22 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from abc import abstractmethod
+from base import Activation
 from model_utils import sigmoid
 import numpy as np
-
-
-class Activation:
-    """
-    Base class for activation function of a layer
-    """
-    @abstractmethod
-    def forward(self, x):
-        pass
-
-    @abstractmethod
-    def derivate(self, x):
-        pass
 
 
 class Sigmoid(Activation):

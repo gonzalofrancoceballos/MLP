@@ -18,20 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import numpy as np
-from abc import abstractmethod
 
-
-class Optimizer:
-    """
-    Base class for optimizer
-    """
-    @abstractmethod
-    def update_weights(self, layers):
-        pass
-
-    @abstractmethod
-    def initialize_parameters(self, layers):
-        pass
+from base import Optimizer
 
 
 class GradientDescent(Optimizer):

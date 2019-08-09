@@ -18,20 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import numpy as np
-from abc import abstractmethod
-
-
-class Loss:
-    """
-    Base class for loss function for prediction error
-    """
-    @abstractmethod
-    def forward(self, actual: np.array, prediction: np.array) -> np.array:
-        pass
-
-    @abstractmethod
-    def derivate(self, actual: np.array, prediction: np.array) -> np.array:
-        pass
+from base import Loss
 
 
 class MSE(Loss):
@@ -109,8 +96,8 @@ class Logloss(Loss):
         
         # Clip prediction to avioid 0 and 1
         prediction = np.clip(prediction, self._eps, 1 - self._eps)
-        
-        return -(actual*np.log(prediction) + (1-actual)*np.log(1-prediction))
+
+        return -(actual * np.log(prediction) + (1 - actual) * np.log(1 - prediction))
     
     def derivate(self, actual: np.array, prediction: np.array) -> np.array:
         """
@@ -122,8 +109,7 @@ class Logloss(Loss):
         
         # Clip prediction to avioid 0 and 1
         prediction = np.clip(prediction, self._eps, 1 - self._eps)
-        
-        return -(actual/prediction) + ((1-actual)/(1-prediction))
+        return -(actual / prediction) + ((1 - actual) / (1 - prediction))
 
 
 class Quantile(Loss):

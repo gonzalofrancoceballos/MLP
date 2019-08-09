@@ -21,20 +21,23 @@ import numpy as np
 import pandas as pd
 
 from data_processing import Batcher
-from losses import Loss
-from optimizers import Optimizer, Adam
+from base import Loss, Optimizer
+from optimizers import Adam
+
+
+default_params = {"n_epoch": 10,
+                  "batch_size": 128,
+                  "n_stopping_rounds": 10,
+                  "learning_rate": 0.0001,
+                  "reg_lambda": 0.01,
+                  "verbose": True,
+                  "print_rate": 5,
+                  "early_stopping": False}
 
 
 class ModelTrain:
     def __init__(self, params=None):
-        self._train_params = {"n_epoch": 10,
-                              "batch_size": 128,
-                              "n_stopping_rounds": 10,
-                              "learning_rate": 0.0001,
-                              "reg_lambda": 0.01,
-                              "verbose": True,
-                              "print_rate": 5,
-                              "early_stopping": False}
+        self._train_params = default_params
 
         self._update_params(params)
         self._batcher = None

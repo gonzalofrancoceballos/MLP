@@ -18,30 +18,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import numpy as np
+
+from base import Layer
 from initializers import Glorot
-from abc import abstractmethod
 from helpers import assign_activation
-
-
-class Layer:
-    """
-    Base class for layer
-    """
-    @abstractmethod
-    def reset_layer(self, **kwargs):
-        pass
-
-    @abstractmethod
-    def forward(self, x: np.array) -> np.array:
-        pass
-
-    @abstractmethod
-    def to_dict(self):
-        pass
-
-    @abstractmethod
-    def _from_dict(self, layer_dict: dict):
-        pass
 
 
 class Dense(Layer):

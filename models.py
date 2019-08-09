@@ -18,61 +18,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import numpy as np
-from abc import abstractmethod
 
 import model_utils
-from layers import Layer, Dense
-from losses import Loss
+from layers import Dense
+from base import Layer, Model
 from train import ModelTrain
 from optimizers import Adam
 
 
 """
 TODO:
-- Load/save model functionality (testing)
 - Save train log
-- Multi-label clasification
 - Multi-level classification
 - Softmax activation
 - Keep trainlog
 """
-
-
-class Model:
-    """
-    Base class for a model
-    """
-    @abstractmethod
-    def predict(self, x: np.array) -> np.array:
-        pass
-
-    @abstractmethod
-    def train(self, **kwargs):
-        pass
-
-    @abstractmethod
-    def forward_prop(self, x: np.array) -> np.array:
-        pass
-
-    @abstractmethod
-    def back_prop(self, x: np.array, y: np.array, loss: Loss, reg_lambda: float):
-        pass
-
-    @abstractmethod
-    def add(self, layer: Layer):
-        pass
-
-    @abstractmethod
-    def compile(self):
-        pass
-
-    @abstractmethod
-    def save(self, path: str):
-        pass
-
-    @abstractmethod
-    def load(self, path: str):
-        pass
 
 
 class BasicMLP(Model):
@@ -193,7 +153,8 @@ class BasicMLP(Model):
             if i == self.n_layers - 1:
                 a_in = x
             else:
-                a_in = layer.A
+                prev_layer = self.layers[-i-2]
+                a_in = prev_layer.A
             delta_out = layer.delta
             layer.db = delta_out.sum(axis=0).reshape([1, -1])
             layer.dW = np.matmul(a_in.T, delta_out)
