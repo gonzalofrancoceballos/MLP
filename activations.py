@@ -38,7 +38,7 @@ class Sigmoid(Activation):
         :param x: tensor apply operation element-wise (type: np.array)
         :return: result of the operation (type: np.array)
         """
-        return sigmoid(x)
+        return 1. / (1. + np.exp(-x))
 
     def derivate(self, x):
         """
@@ -46,7 +46,7 @@ class Sigmoid(Activation):
         :param x: tensor apply operation element-wise (type: np.array)
         :return: result of the operation (type: np.array)
         """
-        return (1-sigmoid(x)) * sigmoid(x)
+        return (1 - self.forward(x)) * self.forward(x)
 
 
 class Swish(Activation):
@@ -190,3 +190,32 @@ class Linear(Activation):
         :return: result of the operation (type: np.array)
         """
         return 1
+
+
+class Softmax(Activation):
+    """
+    Softmax activation function
+    """
+
+    def __init__(self):
+        """
+        Initialize object
+        """
+        self.type = "softmax"
+
+    def forward(self, x):
+        """
+        Forward propagation operation
+        :param x: tensor apply operation element-wise (type: np.array)
+        :return: result of the operation (type: np.array)
+        """
+        exps = np.exp(x - np.max(x))
+        return exps / np.sum(exps, axis=1).reshape([-1, 1])
+
+    def derivate(self, x):
+        """
+        Derivative of the activation function at each point of the input tensor
+        :param x: tensor apply operation element-wise (type: np.array)
+        :return: result of the operation (type: np.array)
+        """
+        return (1 - self.forward(x)) * self.forward(x)

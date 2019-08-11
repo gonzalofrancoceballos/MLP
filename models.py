@@ -29,8 +29,6 @@ from optimizers import Adam
 """
 TODO:
 - Save train log
-- Multi-level classification
-- Softmax activation
 - Keep trainlog
 """
 

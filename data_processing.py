@@ -40,17 +40,17 @@ class Batcher:
             self.data_size = data[0].shape[0]
         else:
             self.data_size = data.shape[0]
-        self.n_batches = int(np.ceil(self.data_size/self.batch_size))
-        self.I = np.arange(0, self.data_size, dtype=int)
+        self.n_batches = int(np.ceil(self.data_size / self.batch_size))
+        self.idx = np.arange(0, self.data_size, dtype=int)
         if shuffle_on_reset:
-            np.random.shuffle(self.I)
+            np.random.shuffle(self.idx)
         self.current = 0
         
     def shuffle(self):
         """
         Re-shufle the data
         """
-        np.random.shuffle(self.I)
+        np.random.shuffle(self.idx)
         
     def reset(self):
         """
@@ -65,7 +65,7 @@ class Batcher:
         Get next batch
         :return: list of np.arrays
         """
-        i_select = self.I[(self.current*self.batch_size):((self.current+1)*self.batch_size)]
+        i_select = self.idx[(self.current * self.batch_size):((self.current + 1) * self.batch_size)]
         batch = []
         for elem in self.data:
             batch.append(elem[i_select])
