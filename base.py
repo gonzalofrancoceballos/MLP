@@ -94,6 +94,10 @@ class Model:
     def load(self, path: str):
         pass
 
+    @abstractmethod
+    def reset_layers(self):
+        pass
+
 
 class Optimizer:
     """
