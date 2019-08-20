@@ -21,10 +21,9 @@ import numpy as np
 
 import model_utils
 from layers import Dense
-from base import Layer, Model
+from base import Layer, Model, Loss, Optimizer
 from train import ModelTrain
 from optimizers import Adam
-
 
 """
 TODO:
@@ -99,8 +98,9 @@ class BasicMLP(Model):
     def predict(self, x: np.array) -> np.array:
         """
         Computes a forward pass and returns prediction
+        Note that this operation will not update Z and A of each weight, this must
+        only happen during train
 
-        Note that this operation will not update Z and A of each weight
         :param x: input matrix to the network (type: np.array)
 
         :return: output of the network (type: np.array)
@@ -109,11 +109,26 @@ class BasicMLP(Model):
         pred = self.forward_prop(x, update=False)
         return pred
 
-    def train(self, loss, train_data, optimizer=Adam(), dev_data=None, params=None):
+    def train(self,
+              loss: Loss,
+              train_data: list,
+              optimizer: Optimizer = Adam(),
+              dev_data: list = None,
+              params: dict = None):
+        """
+        Perform train operation
+
+        :param loss: loss function (type: Loss)
+        :param train_data: train data (type: list[np.array])
+        :param optimizer: optimizar to use (type: Oprtimizer)
+        :param dev_data: data to use for early-stopping, optional (type: list[np.array])
+        :param params: parameters for train (type: dict)
+        """
+
         self._trainer = ModelTrain()
         self._trainer.train(self, loss, train_data, optimizer, dev_data, params)
 
-    def forward_prop(self, x, update=True):
+    def forward_prop(self, x: np.array, update: bool = True):
         """
         Computes a forward pass though the architecture of the network
 
@@ -129,7 +144,7 @@ class BasicMLP(Model):
 
         return A
 
-    def back_prop(self, x, y, loss, reg_lambda=0.01):
+    def back_prop(self, x: np.array, y: np.array, loss: Loss, reg_lambda=0.01):
         """
         Computes back-propagation pass through the network
         It retrieves output of the final layer, self.layers[-1].A, and back-propagates
@@ -144,7 +159,7 @@ class BasicMLP(Model):
         self._update_deltas(loss, y)
         self._update_gradients(x, reg_lambda)
 
-    def _update_deltas(self, loss, y):
+    def _update_deltas(self, loss: Loss, y: np.array):
         """
         Starting from last layer, compute and update deltas in reverse order
 
@@ -160,7 +175,7 @@ class BasicMLP(Model):
                 layer_next = self.layers[-i]
                 layer.update_delta(layer_next)
 
-    def _update_gradients(self, x, reg_lambda):
+    def _update_gradients(self, x: np.array, reg_lambda: float):
         """
         Compute and update gradients of each layers
 
