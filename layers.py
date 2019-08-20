@@ -55,6 +55,10 @@ class Dense(Layer):
 
         self.W = None
         self.b = None
+        self.delta = None
+        self.db = None
+        self.dW = None
+
         if layer_dict is not None:
             self._from_dict(layer_dict)
         elif units is None or activation is None:
@@ -96,12 +100,36 @@ class Dense(Layer):
 
         :return: result of forward operation (type: np.array)
         """
+
         Z = np.matmul(x, self.W) + self.b
         A = self.activation.forward(Z)
         if update:
             self.Z = Z
             self.A = A
         return A
+
+    def update_delta(self, next_layer):
+        """
+        Computes and updates delta in back-propagation
+
+        :param next_layer: next layer (type: Layer)
+        """
+
+        delta = np.matmul(next_layer.delta, next_layer.W.T) * self.activation.derivate(self.Z)
+        self.delta = delta
+
+    def update_gradients(self, a_in, reg_lambda):
+        """
+        Computes and updates gradients in back-propagation
+
+        :param a_in: input matrix to the layer (type: np.array)
+        :param reg_lambda: regularization factor (type: float)
+        """
+
+        delta_out = self.delta
+        self.db = delta_out.sum(axis=0).reshape([1, -1])
+        self.dW = np.matmul(a_in.T, delta_out)
+        self.dW += reg_lambda * self.W
 
     def to_dict(self):
         layer_dict = {
@@ -119,6 +147,7 @@ class Dense(Layer):
         :param layer_dict:
         :return:
         """
+
         self.type = layer_dict["type"]
         self.W = np.array(layer_dict["W"])
         self.b = np.array(layer_dict["b"])

@@ -36,6 +36,14 @@ class Layer:
     def _from_dict(self, layer_dict: dict):
         pass
 
+    @abstractmethod
+    def update_delta(self, next_layer):
+        pass
+
+    @abstractmethod
+    def update_gradients(self, a_in: np.array, reg_lambda: float):
+        pass
+
 
 class Loss:
     """

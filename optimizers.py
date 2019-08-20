@@ -86,8 +86,10 @@ class Adam(Optimizer):
         """
         Perform update rule
         :param layers: layers of the MLP to update (type: list[Dense()])
+
         :return: layers with updated weights (type: list[Dense()])
         """
+
         t = self.t
         for i, layer in enumerate(layers):            
             adam = {

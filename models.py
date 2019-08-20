@@ -45,10 +45,12 @@ class BasicMLP(Model):
         :param model_dict: python dictionary containing all necessary information to
         instantiate an existing model (type: dict)
         """
+        self.reg_lambda = 0.01
         self.layers = []
         self.n_layers = 0
         self._model_dict = model_dict
         self._trainer = None
+        self.train_log = None
         if self._model_dict is not None:
             self._build_architecture_from_dict()
 
@@ -114,14 +116,15 @@ class BasicMLP(Model):
     def forward_prop(self, x, update=True):
         """
         Computes a forward pass though the architecture of the network
+
         :param x: input matrix to the network (type: np.array)
         :param update: flag to update latest values through the network (type: bool)
 
         :return: output of the network (type: np.array)
         """
 
-        A = self.layers[0].forward(x, update=update)
-        for layer in self.layers[1:]:
+        A = x
+        for layer in self.layers:
             A = layer.forward(A, update=update)
 
         return A
@@ -135,28 +138,43 @@ class BasicMLP(Model):
         :param x: input matrix to the network (type: np.array)
         :param y: target vector (type: np.array)
         :param loss: loss funtion object (type: Loss)
-        :param reg_lambda: regularizartion factor (type: float)
+        :param reg_lambda: regularizatiopn factor for gradients (type: float)
+        """
+
+        self._update_deltas(loss, y)
+        self._update_gradients(x, reg_lambda)
+
+    def _update_deltas(self, loss, y):
+        """
+        Starting from last layer, compute and update deltas in reverse order
+
+        :param loss: loss function object (type: Loss)
+        :param y: target verctor (type: np.array)
         """
 
         for i, layer in enumerate(reversed(self.layers)):
-            # Compute deltas
             if i == 0:
                 delta = loss.derivate(y, layer.A) * layer.activation.derivate(layer.Z)
+                layer.delta = delta
             else:
                 layer_next = self.layers[-i]
-                delta = np.matmul(layer_next.delta, layer_next.W.T) * layer.activation.derivate(layer.Z)
-            layer.delta = delta
+                layer.update_delta(layer_next)
 
-            # Compute gradients
-            if i == self.n_layers - 1:
+    def _update_gradients(self, x, reg_lambda):
+        """
+        Compute and update gradients of each layers
+
+        :param x: feature matrix (type: np.array)
+        :param reg_lambda: regularization factor (type: float)
+        """
+
+        for i, layer in enumerate(self.layers):
+            if i == 0:
                 a_in = x
             else:
-                prev_layer = self.layers[-i-2]
+                prev_layer = self.layers[i - 1]
                 a_in = prev_layer.A
-            delta_out = layer.delta
-            layer.db = delta_out.sum(axis=0).reshape([1, -1])
-            layer.dW = np.matmul(a_in.T, delta_out)
-            layer.dW += reg_lambda * layer.W
+            layer.update_gradients(a_in, reg_lambda)
 
     def save(self, path: str):
         """
@@ -164,6 +182,7 @@ class BasicMLP(Model):
 
         :param path: path to save model as json
         """
+
         model_dict = self.return_model_dict()
         model_utils.save_json(model_dict, path)
 
@@ -204,8 +223,10 @@ class BasicMLP(Model):
     def _get_layers(self):
         """
         Return layer weights and activation type in a list of dicts
+
         :return: list of layers (type: list[dict])
         """
+
         layers = []
         for layer in self.layers:
             layer_i = layer.to_dict()
@@ -219,3 +240,4 @@ class BasicMLP(Model):
         """
         for layer in self.layers:
             layer.reset_layer()
+
