@@ -29,6 +29,10 @@ from optimizers import Adam
 TODO:
 - Save train log
 - Keep trainlog
+- 2D Conv layer
+- 3D Conv layer
+- Flatten layer
+- Concat layer
 """
 
 
