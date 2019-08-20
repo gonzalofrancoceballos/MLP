@@ -241,3 +241,11 @@ class BasicMLP(Model):
         for layer in self.layers:
             layer.reset_layer()
 
+    def plot_train(self):
+        """
+        Plot results of train operation
+        """
+        if self.train_log is not None:
+            train_log = self.train_log.copy()
+            train_log["batch"] = train_log.index
+            train_log.plot(x="batch", y="loss")
