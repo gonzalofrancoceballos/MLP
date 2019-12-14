@@ -75,10 +75,10 @@ class Adam(Optimizer):
         """
         for i, layer in enumerate(layers):
             adam = {
-                "mW": np.zeros(layer.dW.shape),
-                "mb": np.zeros(layer.db.shape),
-                "vW": np.zeros(layer.dW.shape),
-                "vb": np.zeros(layer.db.shape)}
+                "mW": np.zeros([layer.input_dim, layer.output_dim]),
+                "mb": np.zeros([1, layer.output_dim]),
+                "vW": np.zeros([layer.input_dim, layer.output_dim]),
+                "vb": np.zeros([1, layer.output_dim])}
             layers[i].adam = adam
         return layers
 
