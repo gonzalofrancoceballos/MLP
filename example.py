@@ -1,6 +1,10 @@
 import models
 import numpy as np
 import pandas as pd
+from layers import Dense
+from activations import Sigmoid, Relu, Linear
+from losses import Logloss, MSE, Quantile
+
 
 """
 Several reproducible examples for MLP model
@@ -8,21 +12,24 @@ Several reproducible examples for MLP model
 
 
 # Dummy function to create synthetic dataset
-def f(X):
+def f(x):
     """
     Simple function
     f(x0,x1,x2) = x0 + 2*x1 - x2**2
     
-    :param X: input matrix with columns x0, x1, x2 (type: np.array)
+    :param x: input matrix with columns x0, x1, x2 (type: np.array)
     :return: f(X) (type: np.array) 
     
     """
-    res = X[:,0] + 2*X[:, 1] - X[:,2]**2
-    res = res.reshape([-1,1])
+    res = x[:, 0] + 2 * x[:, 1] - x[:, 2] ** 2
+    res = res.reshape([-1, 1])
     
     return res
 
 
+print("---------------------------------------------")
+print("---- Regression model -----------------------")
+print("---------------------------------------------")
 # REGRESSION
 # Creating synthetic dataset
 N = 100000
@@ -36,27 +43,37 @@ y_pred = f(X_pred)
 
 
 # Instantiating model object
-mlp = models.MLP(X, hidden_layers=[5, 4, 2], activation="tanh", optimizer="adam")
+model = models.BasicMLP()
+model.add(Dense(units=8, activation=Relu(), input_dim=X.shape[1]))
+model.add(Dense(units=4, activation=Relu()))
+model.add(Dense(units=4, activation=Relu()))
+model.add(Dense(units=1, activation=Linear()))
 
 # Model train
-mlp.train(X, y,
-          X_dev=X_dev, 
-          y_dev=y_dev,
-          n_epoch=100,
-          n_stopping_rounds=30)
+params = {
+    "learning_rate": 0.001, 
+    "n_epoch": 100,
+    "print_rate": 10
+    }
+loss = MSE()
+print(model.layers)
+model.train(loss, train_data=[X, y], params=params)
 
 # Run predict on new data
-predictions = mlp.predict(X_pred)
+predictions = model.predict(X_pred)
 
 # Evaluate model performance using the same metric it used to train
-performance = mlp._compute_loss(predictions, y_pred)
-print(f"Prediction loss: {performance}")
+performance = loss.forward(predictions, y_pred)
+print(f"Prediction loss: {performance.mean()}")
 
 
-# CLASSIFICATION
+print("---------------------------------------------")
+print("---- Classification model -------------------")
+print("---------------------------------------------")
 
-# Get data
-iris = pd.read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data", header=None)
+print("Pulling Iris data from url...")
+iris_url = "https://archive.ics.uci.edu/ml/machine-learning-databases/iris/iris.data"
+iris = pd.read_csv(iris_url, header=None)
 feature_cols = ["v1", "v2", "v3", "v4"]
 iris.columns = feature_cols + ["class"]
 iris["target"] = np.where(iris["class"] == "Iris-setosa", 1, 0)
@@ -65,19 +82,27 @@ y = iris["target"].values.reshape([-1, 1])
 
 
 # Instantiating model object
-mlp = models.MLP(X, 
-                 hidden_layers=[3, 3, 2],
-                 activation="swish", 
-                 optimizer="adam", 
-                 problem="binary_classification",
-                 loss="logloss")
+print("Creating model...")
+model = models.BasicMLP()
+model.add(Dense(units=32, activation=Relu(), input_dim=X.shape[1]))
+model.add(Dense(units=64, activation=Relu()))
+model.add(Dense(units=8, activation=Relu()))
+model.add(Dense(units=1, activation=Sigmoid()))
 
 # Model train (not usin dev this time)
-mlp.train(X, y, n_epoch=1000, learning_rate=0.01)
+params = {
+    "learning_rate": 0.001, 
+    "n_epoch": 100,
+    "print_rate": 10
+    }
+loss = Logloss()
+print("Starting train...")
+model.train(loss, train_data=[X, y], params=params)
 
 
-# QUANTILE
-
+print("---------------------------------------------")
+print("---- Quantile model -------------------------")
+print("---------------------------------------------")
 # Creating synthetic dataset
 N = 100000
 X = 100 * (np.random.rand(N, 3) - 0.5)
@@ -89,45 +114,32 @@ noise = noise.reshape([-1, 1])
 
 # We need noise in the data for the quantile regression
 y = f(X) * (1+noise)
-y_dev = f(X_dev)
-y_pred = f(X_pred)
 
 # Instantiating model object for quantile 1
-mlp_q1 = models.MLP(X,
-                    hidden_layers=[5, 5, 5],
-                    activation="tanh", optimizer="adam", 
-                    problem="quantile",
-                    loss="quantile",
-                    q=0.01)
+model = models.BasicMLP()
+model.add(Dense(units=16, activation=Relu(), input_dim=X.shape[1]))
+model.add(Dense(units=8, activation=Relu()))
+model.add(Dense(units=4, activation=Relu()))
+model.add(Dense(units=1, activation=Linear()))
 
 # Model train
-mlp_q1.train(X, y,
-             X_dev=X_dev, 
-             y_dev=y_dev,
-             n_epoch=100,
-             n_stopping_rounds=30,
-             verbose=False)
+params = {
+    "learning_rate": 0.001, 
+    "n_epoch": 100,
+    "print_rate": 10
+    }
+loss = Quantile(0.01)
+model.train(loss, train_data=[X, y], params=params)
 
 
 # Run predict on new data
-predictions_q1 = mlp_q1.predict(X_pred)
+predictions_q1 = model.predict(X_pred)
 print(f"Prediction average for quantile 1: {predictions_q1.mean()}")
 
 # Instantiating model object for quantile 99
-mlp_q99 = models.MLP(X, hidden_layers=[5, 5, 5],
-                     activation="tanh", optimizer="adam",
-                     problem="quantile",
-                     loss="quantile",
-                     q=0.99)
-
-# Model train
-mlp_q99.train(X, y,
-              X_dev=X_dev, 
-              y_dev=y_dev,
-              n_epoch=100,
-              n_stopping_rounds=30, 
-              verbose=False)
+loss = Quantile(0.99)
+model.train(loss, train_data=[X, y], params=params)
 
 # Run predict on new data
-predictions_q99 = mlp_q99.predict(X_pred)
-print(f"Prediction average for quantile 1: {predictions_q99.mean()}")
+predictions_q99 = model.predict(X_pred)
+print(f"Prediction average for quantile 99: {predictions_q99.mean()}")
