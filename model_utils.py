@@ -8,7 +8,7 @@ def sigmoid(x):
     :param x: input matrix (type:np.array)
     :output: result of applying sigmoid functin element-wise
     """
-    return 1. / (1. + np.exp(-x))
+    return 1.0 / (1.0 + np.exp(-x))
 
 
 def read_json(file):
@@ -28,16 +28,16 @@ def save_json(dict_object, file):
     :param dict_object: python dictionary to save
     :param file: path to json file
     """
-    
-    with open(file, 'w') as fp:
+
+    with open(file, "w") as fp:
         json.dump(dict_object, fp)
 
-        
+
 class DummyLogger:
     """
     Dummy print function wrapper that is called like a logger
     """
-    
+
     def __init__(self):
         """
         Initialize object

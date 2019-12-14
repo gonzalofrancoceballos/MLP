@@ -20,9 +20,13 @@ class Rand(Initializer):
 class Glorot(Initializer):
     def initialize(self, layer) -> tuple:
         if layer.activation.type == "relu":
-            W = np.random.normal(0, size=[layer.input_dim, layer.output_dim]) * np.sqrt(2 / layer.input_dim)
+            W = np.random.normal(0, size=[layer.input_dim, layer.output_dim]) * np.sqrt(
+                2 / layer.input_dim
+            )
         else:
-            W = np.random.normal(0, size=[layer.input_dim, layer.output_dim]) * np.sqrt(1 / layer.input_dim)
+            W = np.random.normal(0, size=[layer.input_dim, layer.output_dim]) * np.sqrt(
+                1 / layer.input_dim
+            )
 
         b = np.zeros([1, layer.output_dim])
         dW = np.zeros([layer.input_dim, layer.output_dim])

@@ -86,7 +86,9 @@ class BasicMLP(Model):
 
         if len(self.layers) == 0:
             if layer.input_dim is None:
-                raise AttributeError("It is necessary to especify input dim for first layer")
+                raise AttributeError(
+                    "It is necessary to especify input dim for first layer"
+                )
         else:
             layer.input_dim = self.layers[-1].output_dim
 
@@ -114,12 +116,14 @@ class BasicMLP(Model):
         pred = self.forward_prop(x, update=False)
         return pred
 
-    def train(self,
-              loss: Loss,
-              train_data: list,
-              optimizer: Optimizer = Adam(),
-              dev_data: list = None,
-              params: dict = None):
+    def train(
+        self,
+        loss: Loss,
+        train_data: list,
+        optimizer: Optimizer = Adam(),
+        dev_data: list = None,
+        params: dict = None,
+    ):
         """
         Perform train operation
 
@@ -234,9 +238,7 @@ class BasicMLP(Model):
         :return: model info (type: dict)
         """
 
-        model_dict = {
-            "layers": self._get_layers()
-        }
+        model_dict = {"layers": self._get_layers()}
 
         return model_dict
 

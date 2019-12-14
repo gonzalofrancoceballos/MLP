@@ -23,7 +23,7 @@ def f(x):
     """
     res = x[:, 0] + 2 * x[:, 1] - x[:, 2] ** 2
     res = res.reshape([-1, 1])
-    
+
     return res
 
 
@@ -50,11 +50,7 @@ model.add(Dense(units=4, activation=Relu()))
 model.add(Dense(units=1, activation=Linear()))
 
 # Model train
-params = {
-    "learning_rate": 0.001, 
-    "n_epoch": 100,
-    "print_rate": 10
-    }
+params = {"learning_rate": 0.001, "n_epoch": 100, "print_rate": 10}
 loss = MSE()
 print(model.layers)
 model.train(loss, train_data=[X, y], params=params)
@@ -90,11 +86,7 @@ model.add(Dense(units=8, activation=Relu()))
 model.add(Dense(units=1, activation=Sigmoid()))
 
 # Model train (not usin dev this time)
-params = {
-    "learning_rate": 0.001, 
-    "n_epoch": 100,
-    "print_rate": 10
-    }
+params = {"learning_rate": 0.001, "n_epoch": 100, "print_rate": 10}
 loss = Logloss()
 print("Starting train...")
 model.train(loss, train_data=[X, y], params=params)
@@ -109,11 +101,11 @@ X = 100 * (np.random.rand(N, 3) - 0.5)
 X_dev = np.random.rand(N, 3)
 X_pred = np.random.rand(N, 3)
 
-noise = (np.random.normal(size=N)-0.5)/5
+noise = (np.random.normal(size=N) - 0.5) / 5
 noise = noise.reshape([-1, 1])
 
 # We need noise in the data for the quantile regression
-y = f(X) * (1+noise)
+y = f(X) * (1 + noise)
 
 # Instantiating model object for quantile 1
 model = models.BasicMLP()
@@ -123,11 +115,7 @@ model.add(Dense(units=4, activation=Relu()))
 model.add(Dense(units=1, activation=Linear()))
 
 # Model train
-params = {
-    "learning_rate": 0.001, 
-    "n_epoch": 100,
-    "print_rate": 10
-    }
+params = {"learning_rate": 0.001, "n_epoch": 100, "print_rate": 10}
 loss = Quantile(0.01)
 model.train(loss, train_data=[X, y], params=params)
 

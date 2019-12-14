@@ -35,13 +35,15 @@ class Dense(Layer):
     b: bias vector of size [1, output_dim]
     """
 
-    def __init__(self,
-                 units=None,
-                 activation=None,
-                 input_dim=None,
-                 kernel_initializer=Glorot(),
-                 initialize=False,
-                 layer_dict=None):
+    def __init__(
+        self,
+        units=None,
+        activation=None,
+        input_dim=None,
+        kernel_initializer=Glorot(),
+        initialize=False,
+        layer_dict=None,
+    ):
 
         """
         Initialize layer
@@ -77,10 +79,14 @@ class Dense(Layer):
             self.reset_layer()
 
     def __repr__(self):
-        return "[{}|{}] shape: {}\n".format(self.type, self.activation.type, self._get_shape())
+        return "[{}|{}] shape: {}\n".format(
+            self.type, self.activation.type, self._get_shape()
+        )
 
     def __str__(self):
-        return "[{}|{}] shape: {}\n".format(self.type, self.activation.type, self._get_shape())
+        return "[{}|{}] shape: {}\n".format(
+            self.type, self.activation.type, self._get_shape()
+        )
 
     def reset_layer(self):
         """
@@ -117,7 +123,9 @@ class Dense(Layer):
         :param next_layer: next layer (type: Layer)
         """
 
-        delta = np.matmul(next_layer.delta, next_layer.W.T) * self.activation.derivate(self.Z)
+        delta = np.matmul(next_layer.delta, next_layer.W.T) * self.activation.derivate(
+            self.Z
+        )
         self.delta = delta
 
     def update_gradients(self, a_in, reg_lambda):
@@ -138,7 +146,8 @@ class Dense(Layer):
             "type": self.type,
             "W": self.W.tolist(),
             "b": self.b.tolist(),
-            "activation": self.activation.type}
+            "activation": self.activation.type,
+        }
 
         return layer_dict
 

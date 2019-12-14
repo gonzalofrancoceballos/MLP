@@ -25,15 +25,16 @@ from base import Loss, Optimizer
 from optimizers import Adam
 
 
-default_params = {"n_epoch": 10,  # number of epochs
-                  "batch_size": 128,  # batch size
-                  "n_stopping_rounds": 10,  # N of consecutive epochs without improvement for early-stopping
-                  "learning_rate": 0.0001,  # learning rate
-                  "reg_lambda": 0.01,  # regularization factor for gradients
-                  "verbose": True,  # flag to plot train  results
-                  "print_rate": 5,  # print train results every print_rate epochs
-                  "early_stopping": False  # flag to use early-stopping
-                  }
+default_params = {
+    "n_epoch": 10,  # number of epochs
+    "batch_size": 128,  # batch size
+    "n_stopping_rounds": 10,  # N of consecutive epochs without improvement for early-stopping
+    "learning_rate": 0.0001,  # learning rate
+    "reg_lambda": 0.01,  # regularization factor for gradients
+    "verbose": True,  # flag to plot train  results
+    "print_rate": 5,  # print train results every print_rate epochs
+    "early_stopping": False,  # flag to use early-stopping
+}
 
 
 class ModelTrain:
@@ -44,13 +45,15 @@ class ModelTrain:
         self._batcher = None
         self._optimizer = None
 
-    def train(self,
-              model,
-              loss: Loss,
-              train_data: list,
-              optimizer: Optimizer = Adam(),
-              dev_data: list = None,
-              params: dict = None):
+    def train(
+        self,
+        model,
+        loss: Loss,
+        train_data: list,
+        optimizer: Optimizer = Adam(),
+        dev_data: list = None,
+        params: dict = None,
+    ):
         """
         Run several train steps
 
@@ -78,14 +81,18 @@ class ModelTrain:
         model.train_log = []
         model.dev_log = []
         train_loss = []
-        while (epoch <= self._train_params["n_epoch"] and
-               early_stopping_counter < self._train_params["n_stopping_rounds"]):
+        while (
+            epoch <= self._train_params["n_epoch"]
+            and early_stopping_counter < self._train_params["n_stopping_rounds"]
+        ):
             self._batcher.reset()
 
             # Train on batches
             for batch_i in range(self._batcher.n_batches):
                 x_batch, y_batch = self._batcher.next()
-                self._train_step(model, x_batch, y_batch, loss, self._train_params["reg_lambda"])
+                self._train_step(
+                    model, x_batch, y_batch, loss, self._train_params["reg_lambda"]
+                )
                 loss_i = self._compute_loss(model.layers[-1].A, y_batch, loss)
                 train_loss.append(loss_i)
                 model.train_log.append(np.array([epoch, batch_i, loss_i]))
@@ -104,7 +111,9 @@ class ModelTrain:
                     early_stopping_counter += 1
 
                 if verbose and (epoch % self._train_params["print_rate"] == 0):
-                    print(f"epoch: {epoch} | train_loss: {np.mean(train_loss)} |  dev_loss: {dev_loss}")
+                    print(
+                        f"epoch: {epoch} | train_loss: {np.mean(train_loss)} |  dev_loss: {dev_loss}"
+                    )
 
             else:
                 if verbose and (epoch % self._train_params["print_rate"] == 0):
@@ -113,17 +122,16 @@ class ModelTrain:
             epoch += 1
 
         model.train_log = np.vstack(model.train_log)
-        model.train_log = pd.DataFrame(model.train_log, columns=["epoch", "iter", "loss"])
+        model.train_log = pd.DataFrame(
+            model.train_log, columns=["epoch", "iter", "loss"]
+        )
         if dev_data is not None:
             model.dev_log = np.vstack(model.dev_log)
             model.dev_log = pd.DataFrame(model.dev_log, columns=["epoch", "loss"])
 
-    def _train_step(self,
-                    model,
-                    x: np.array,
-                    y: np.array,
-                    loss: Loss,
-                    reg_lambda: float = 0.01):
+    def _train_step(
+        self, model, x: np.array, y: np.array, loss: Loss, reg_lambda: float = 0.01
+    ):
         """
         Performs a complete train step of the network
         (1) Forward pass: computes Z and A for each layer
@@ -144,9 +152,7 @@ class ModelTrain:
         model.layers = self._optimizer.update_weights(model.layers)
 
     @staticmethod
-    def _compute_loss(actual: np.array,
-                      prediction: np.array,
-                      loss: Loss) -> np.array:
+    def _compute_loss(actual: np.array, prediction: np.array, loss: Loss) -> np.array:
         """
         Computes loss between prediction and target
 

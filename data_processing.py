@@ -35,7 +35,7 @@ class Batcher:
         self.data = data
         self.batch_size = batch_size
         self.shuffle_on_reset = shuffle_on_reset
-        
+
         if type(data) == list:
             self.data_size = data[0].shape[0]
         else:
@@ -45,13 +45,13 @@ class Batcher:
         if shuffle_on_reset:
             np.random.shuffle(self.idx)
         self.current = 0
-        
+
     def shuffle(self):
         """
         Re-shufle the data
         """
         np.random.shuffle(self.idx)
-        
+
     def reset(self):
         """
         Reset iteration counter
@@ -59,20 +59,22 @@ class Batcher:
         if self.shuffle_on_reset:
             self.shuffle()
         self.current = 0
-        
+
     def next(self):
         """
         Get next batch
         :return: list of np.arrays
         """
-        i_select = self.idx[(self.current * self.batch_size):((self.current + 1) * self.batch_size)]
+        i_select = self.idx[
+            (self.current * self.batch_size) : ((self.current + 1) * self.batch_size)
+        ]
         batch = []
         for elem in self.data:
             batch.append(elem[i_select])
-        
+
         if self.current < (self.n_batches - 1):
-            self.current = self.current+1
+            self.current = self.current + 1
         else:
             self.reset()
-            
+
         return batch

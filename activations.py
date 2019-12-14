@@ -26,6 +26,7 @@ class Sigmoid(Activation):
     """
     Sigmoid activation function
     """
+
     def __init__(self):
         """
         Initialize object
@@ -38,7 +39,7 @@ class Sigmoid(Activation):
         :param x: tensor apply operation element-wise (type: np.array)
         :return: result of the operation (type: np.array)
         """
-        return 1. / (1. + np.exp(-x))
+        return 1.0 / (1.0 + np.exp(-x))
 
     def derivate(self, x):
         """
@@ -53,6 +54,7 @@ class Swish(Activation):
     """
     Swish activation function
     """
+
     def __init__(self):
         """
         Initialize object
@@ -61,8 +63,8 @@ class Swish(Activation):
 
     @staticmethod
     def _sigmoid_p(x):
-        return (1-sigmoid(x)) * sigmoid(x)
-    
+        return (1 - sigmoid(x)) * sigmoid(x)
+
     def forward(self, x):
         """
         Forward propagation operation
@@ -70,47 +72,49 @@ class Swish(Activation):
         :return: result of the operation (type: np.array)
         """
         return x * sigmoid(x)
-        
+
     def derivate(self, x):
         """
         Derivative of the activation function at each point of the input tensor
         :param x: tensor apply operation element-wise (type: np.array)
         :return: result of the operation (type: np.array)
         """
-        return x*self._sigmoid_p(x) + sigmoid(x)
+        return x * self._sigmoid_p(x) + sigmoid(x)
 
 
 class Relu(Activation):
     """
     ReLu activation function
     """
+
     def __init__(self):
         """
         Initialize object
         """
         self.type = "relu"
-        
+
     def forward(self, x):
         """
         Forward propagation operation
         :param x: tensor apply operation element-wise (type: np.array)
         :return: result of the operation (type: np.array)
         """
-        return np.where(x > 0, x, 0.)
-    
+        return np.where(x > 0, x, 0.0)
+
     def derivate(self, x):
         """
         Derivative of the activation function at each point of the input tensor
         :param x: tensor apply operation element-wise (type: np.array)
         :return: result of the operation (type: np.array)
         """
-        return np.where(x > 0, 1., 0.)
+        return np.where(x > 0, 1.0, 0.0)
 
 
 class LeakyRelu(Activation):
     """
     Leaky activation function
     """
+
     def __init__(self, m=0.01):
         """
         Initialization of the activation function
@@ -118,35 +122,35 @@ class LeakyRelu(Activation):
         """
         self.m = m
         self.type = "leaky_relu"
-        
+
     def forward(self, x):
         """
         Forward propagation operation
         :param x: tensor apply operation element-wise (type: np.array)
         :return: result of the operation (type: np.array)
         """
-        return np.where(x > 0, x, self.m*x)
-    
+        return np.where(x > 0, x, self.m * x)
+
     def derivate(self, x):
         """
         Derivative of the activation function at each point of the input tensor
         :param x: tensor apply operation element-wise (type: np.array)
         :return: result of the operation (type: np.array)
         """
-        return np.where(x > 0, 1., self.m)
+        return np.where(x > 0, 1.0, self.m)
 
 
 class Tanh(Activation):
     """
     Tanh activation function
     """
-    
+
     def __init__(self):
         """
         Initialize object
         """
         self.type = "tanh"
-        
+
     def forward(self, x):
         """
         Forward propagation operation
@@ -154,27 +158,27 @@ class Tanh(Activation):
         :return: result of the operation (type: np.array)
         """
         return np.tanh(x)
-    
+
     def derivate(self, x):
         """
         Derivative of the activation function at each point of the input tensor
         :param x: tensor apply operation element-wise (type: np.array)
         :return: result of the operation (type: np.array)
         """
-        return 1-np.tanh(x)**2
+        return 1 - np.tanh(x) ** 2
 
 
 class Linear(Activation):
     """
     Linear activation function
     """
-    
+
     def __init__(self):
         """
         Initialize object
         """
         self.type = "linear"
-        
+
     def forward(self, x):
         """
         Forward propagation operation
@@ -182,7 +186,7 @@ class Linear(Activation):
         :return: result of the operation (type: np.array)
         """
         return x
-    
+
     def derivate(self, x):
         """
         Derivative of the activation function at each point of the input tensor

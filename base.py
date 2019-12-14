@@ -7,6 +7,7 @@ class Activation:
     """
     Base class for activation function of a layer
     """
+
     @abstractmethod
     def forward(self, x):
         pass
@@ -20,6 +21,7 @@ class Layer:
     """
     Base class for layer
     """
+
     @abstractmethod
     def reset_layer(self, **kwargs):
         pass
@@ -49,6 +51,7 @@ class Loss:
     """
     Base class for loss function for prediction error
     """
+
     @abstractmethod
     def forward(self, actual: np.array, prediction: np.array) -> np.array:
         pass
@@ -62,6 +65,7 @@ class Model:
     """
     Base class for a model
     """
+
     @abstractmethod
     def predict(self, x: np.array) -> np.array:
         pass
@@ -103,6 +107,7 @@ class Optimizer:
     """
     Base class for optimizer
     """
+
     @abstractmethod
     def update_weights(self, layers):
         pass
