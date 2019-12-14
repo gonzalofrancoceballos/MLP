@@ -90,6 +90,7 @@ class BasicMLP(Model):
         else:
             layer.input_dim = self.layers[-1].output_dim
 
+        layer.reset_layer()
         self.layers.append(layer)
         self.n_layers += 1
 
