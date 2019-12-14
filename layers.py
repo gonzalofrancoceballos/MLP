@@ -154,7 +154,4 @@ class Dense(Layer):
         self.activation = assign_activation(layer_dict["activation"])
 
     def _get_shape(self):
-        if self.W is None:
-            return None
-        else:
-            return self.W.shape
+        return [self.input_dim, self.output_dim]
