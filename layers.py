@@ -58,6 +58,8 @@ class Dense(Layer):
         self.delta = None
         self.db = None
         self.dW = None
+        self.Z = None
+        self.A = None
 
         if layer_dict is not None:
             self._from_dict(layer_dict)
