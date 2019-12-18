@@ -18,7 +18,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import numpy as np
-from base import Loss
+from abc import abstractmethod
+
+
+class Loss:
+    """
+    Base class for loss function for prediction error
+    """
+
+    @abstractmethod
+    def forward(self, actual: np.array, prediction: np.array) -> np.array:
+        pass
+
+    @abstractmethod
+    def derivate(self, actual: np.array, prediction: np.array) -> np.array:
+        pass
 
 
 class MSE(Loss):

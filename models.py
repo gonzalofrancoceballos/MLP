@@ -18,12 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import numpy as np
-
 import model_utils
-from layers import Dense
-from base import Layer, Model, Loss, Optimizer
+
+from abc import abstractmethod
+from layers import Dense, Layer
+from losses import Loss
 from train import ModelTrain
-from optimizers import Adam
+from optimizers import Optimizer, Adam
 
 """
 TODO:
@@ -34,6 +35,48 @@ TODO:
 - Flatten layer
 - Concat layer
 """
+
+
+class Model:
+    """
+    Base class for a model
+    """
+
+    @abstractmethod
+    def predict(self, x: np.array) -> np.array:
+        pass
+
+    @abstractmethod
+    def train(self, **kwargs):
+        pass
+
+    @abstractmethod
+    def forward_prop(self, x: np.array) -> np.array:
+        pass
+
+    @abstractmethod
+    def back_prop(self, x: np.array, y: np.array, loss: Loss, reg_lambda: float):
+        pass
+
+    @abstractmethod
+    def add(self, layer: Layer):
+        pass
+
+    @abstractmethod
+    def compile(self):
+        pass
+
+    @abstractmethod
+    def save(self, path: str):
+        pass
+
+    @abstractmethod
+    def load(self, path: str):
+        pass
+
+    @abstractmethod
+    def reset_layers(self):
+        pass
 
 
 class BasicMLP(Model):

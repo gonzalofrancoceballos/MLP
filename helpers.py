@@ -17,13 +17,12 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import base
 import activations
 import losses
 import optimizers
 
 
-def assign_activation(type: str) -> base.Activation:
+def assign_activation(type: str) -> activations.Activation:
     """
     Returns actiavtion function given type
 
@@ -44,7 +43,7 @@ def assign_activation(type: str) -> base.Activation:
     return options[type]
 
 
-def assign_loss(type: str) -> base.Loss:
+def assign_loss(type: str) -> losses.Loss:
     """
     Returns loss function given type
 
@@ -63,7 +62,7 @@ def assign_loss(type: str) -> base.Loss:
     return options[type]
 
 
-def assign_optimizer(type: str) -> base.Optimizer:
+def assign_optimizer(type: str) -> optimizers.Optimizer:
     """
     Returns optimizer given type
 

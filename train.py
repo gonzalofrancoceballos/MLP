@@ -21,7 +21,8 @@ import numpy as np
 import pandas as pd
 
 from data_processing import Batcher
-from base import Loss, Optimizer
+from losses import Loss
+from optimizers import Optimizer
 from optimizers import Adam
 
 
