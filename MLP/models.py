@@ -18,13 +18,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import numpy as np
-import model_utils
+from MLP import model_utils
 
 from abc import abstractmethod
-from layers import Dense, Layer
-from losses import Loss
-from train import ModelTrain
-from optimizers import Optimizer, Adam
+from MLP.layers import Dense, Layer
+from MLP.losses import Loss
+from MLP.train import ModelTrain
+from MLP.optimizers import Optimizer, Adam
 
 """
 TODO:

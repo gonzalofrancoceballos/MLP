@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import numpy as np
-from model_utils import sigmoid
+from MLP.model_utils import sigmoid
 from abc import abstractmethod
 
 

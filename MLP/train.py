@@ -20,10 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import numpy as np
 import pandas as pd
 
-from data_processing import Batcher
-from losses import Loss
-from optimizers import Optimizer
-from optimizers import Adam
+from MLP.data_processing import Batcher
+from MLP.losses import Loss
+from MLP.optimizers import Optimizer
+from MLP.optimizers import Adam
 
 
 default_params = {

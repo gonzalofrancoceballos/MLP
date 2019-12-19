@@ -17,9 +17,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import activations
-import losses
-import optimizers
+from MLP import activations, losses, optimizers
 
 
 def assign_activation(type: str) -> activations.Activation:

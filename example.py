@@ -1,9 +1,9 @@
-import models
+from MLP import models
 import numpy as np
 import pandas as pd
-from layers import Dense
-from activations import Sigmoid, Relu, Linear
-from losses import Logloss, MSE, Quantile
+from MLP.layers import Dense
+from MLP.activations import Sigmoid, Relu, Linear
+from MLP.losses import Logloss, MSE, Quantile
 
 
 """

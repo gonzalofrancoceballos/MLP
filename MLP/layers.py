@@ -19,8 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
 
-from initializers import Glorot
-from helpers import assign_activation
+from MLP.initializers import Glorot
+from MLP.helpers import assign_activation
 from abc import abstractmethod
 
 
