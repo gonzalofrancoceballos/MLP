@@ -25,7 +25,6 @@ from MLP.losses import Loss
 from MLP.optimizers import Optimizer
 from MLP.optimizers import Adam
 
-
 default_params = {
     "n_epoch": 10,  # number of epochs
     "batch_size": 128,  # batch size
@@ -100,21 +99,16 @@ class ModelTrain:
 
             # Evaluate dev data
             if dev_data is not None:
-                x_dev, y_dev = dev_data
-                dev_pred = model.predict(x_dev)
-                dev_loss = self._compute_loss(dev_pred, y_dev, loss)
-                model.dev_log.append(np.array([epoch, dev_loss]))
-
-                if best_loss > dev_loss:
-                    early_stopping_counter = 0
-                    best_loss = dev_loss
-                else:
-                    early_stopping_counter += 1
-
-                if verbose and (epoch % self._train_params["print_rate"] == 0):
-                    print(
-                        f"epoch: {epoch} | train_loss: {np.mean(train_loss)} |  dev_loss: {dev_loss}"
-                    )
+                early_stopping_counter, best_loss = self._evaluate_dev(
+                    best_loss,
+                    dev_data,
+                    early_stopping_counter,
+                    epoch,
+                    loss,
+                    model,
+                    train_loss,
+                    verbose,
+                )
 
             else:
                 if verbose and (epoch % self._train_params["print_rate"] == 0):
@@ -171,3 +165,29 @@ class ModelTrain:
     def _update_params(self, params: dict):
         if params is not None:
             self._train_params.update(params)
+
+    def _evaluate_dev(
+        self,
+        best_loss,
+        dev_data,
+        early_stopping_counter,
+        epoch,
+        loss,
+        model,
+        train_loss,
+        verbose,
+    ):
+        x_dev, y_dev = dev_data
+        dev_pred = model.predict(x_dev)
+        dev_loss = self._compute_loss(dev_pred, y_dev, loss)
+        model.dev_log.append(np.array([epoch, dev_loss]))
+        if best_loss > dev_loss:
+            early_stopping_counter = 0
+            best_loss = dev_loss
+        else:
+            early_stopping_counter += 1
+        if verbose and (epoch % self._train_params["print_rate"] == 0):
+            print(
+                f"epoch: {epoch} | train_loss: {np.mean(train_loss)} |  dev_loss: {dev_loss}"
+            )
+        return early_stopping_counter, best_loss
