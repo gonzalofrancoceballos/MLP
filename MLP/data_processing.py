@@ -66,7 +66,7 @@ class Batcher:
         :return: list of np.arrays
         """
         i_select = self.idx[
-            (self.current * self.batch_size): ((self.current + 1) * self.batch_size)
+            (self.current * self.batch_size) : ((self.current + 1) * self.batch_size)
         ]
         batch = []
         for elem in self.data:

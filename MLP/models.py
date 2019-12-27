@@ -29,6 +29,7 @@ from MLP.optimizers import Optimizer, Adam
 """
 TODO:
 - Save train log
+- Auto-save best train when using cross-validation
 - Keep trainlog
 - 2D Conv layer
 - 3D Conv layer
@@ -102,13 +103,13 @@ class BasicMLP(Model):
 
     def __repr__(self):
         if self.layers:
-            repr_str = "SimpleMLP model:\n"
+            repr_str = "BasicMLP model:\n"
             for layer in self.layers:
                 repr_str = repr_str + str(layer)
 
             return repr_str
         else:
-            return "Empty SimpleMLP model"
+            return "Empty BasicMLP model"
 
     def __str__(self):
         if self.layers:
@@ -118,7 +119,7 @@ class BasicMLP(Model):
 
             return repr_str
         else:
-            return "Empty SimpleMLP model"
+            return "Empty BasicMLP model"
 
     def add(self, layer: Layer):
         """
@@ -141,8 +142,9 @@ class BasicMLP(Model):
 
     def compile(self):
         """
-        Compiles model before train
+        Compiles model before train. For now, it just resets layers
         """
+
         self.reset_layers()
 
     def predict(self, x: np.array) -> np.array:

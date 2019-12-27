@@ -24,56 +24,64 @@ from numpy.testing import assert_array_almost_equal
 
 
 class TestActivations(unittest.TestCase):
-
     def test_sigmoid_forward(self):
         activation = activations.Sigmoid()
-        assert_array_almost_equal(np.array([0.5]),
-                                  activation.forward(np.array([0])))
+        assert_array_almost_equal(np.array([0.5]), activation.forward(np.array([0])))
 
     def test_sigmoid_backward(self):
         activation = activations.Sigmoid()
-        assert_array_almost_equal(np.array([0, 0]),
-                                  activation.derivate(np.array([1000, -500])))
+        assert_array_almost_equal(
+            np.array([0, 0]), activation.derivate(np.array([1000, -500]))
+        )
 
     def test_relu_forward(self):
         activation = activations.Relu()
-        assert_array_almost_equal(np.array([0, 1, 10]),
-                                  activation.forward(np.array([-1, 1, 10])))
+        assert_array_almost_equal(
+            np.array([0, 1, 10]), activation.forward(np.array([-1, 1, 10]))
+        )
 
     def test_relu_backward(self):
         activation = activations.Relu()
-        assert_array_almost_equal(np.array([0, 1, 1]),
-                                  activation.derivate(np.array([-1, 1, 10])))
+        assert_array_almost_equal(
+            np.array([0, 1, 1]), activation.derivate(np.array([-1, 1, 10]))
+        )
 
     def test_linear_forward(self):
         activation = activations.Linear()
-        assert_array_almost_equal(np.array([-1, 1, 10]),
-                                  activation.forward(np.array([-1, 1, 10])))
+        assert_array_almost_equal(
+            np.array([-1, 1, 10]), activation.forward(np.array([-1, 1, 10]))
+        )
 
     def test_linear_backward(self):
         activation = activations.Linear()
-        assert_array_almost_equal(np.array([1, 1, 1]),
-                                  activation.derivate(np.array([-1, 1, 10])))
+        assert_array_almost_equal(
+            np.array([1, 1, 1]), activation.derivate(np.array([-1, 1, 10]))
+        )
 
     def test_swish_forward(self):
         activation = activations.Swish()
-        assert_array_almost_equal(np.array([0, 1000, 0]),
-                                  activation.forward(np.array([0, 1000, -100])))
+        assert_array_almost_equal(
+            np.array([0, 1000, 0]), activation.forward(np.array([0, 1000, -100]))
+        )
         self.assertGreater(-0.1, activation.forward(-0.5))
 
     def test_swish_backward(self):
         activation = activations.Swish()
-        assert_array_almost_equal(np.array([1, 0, 0.5]),
-                                  activation.derivate(np.array([100, -100, 0])))
+        assert_array_almost_equal(
+            np.array([1, 0, 0.5]), activation.derivate(np.array([100, -100, 0]))
+        )
 
     def test_leaky_relu_forward(self):
         for m in [0.01, 0.1, 1]:
             activation = activations.LeakyRelu(m=m)
-            assert_array_almost_equal(np.array([-10 * m, -m, 1, 10]),
-                                      activation.forward(np.array([-10, -1, 1, 10])))
+            assert_array_almost_equal(
+                np.array([-10 * m, -m, 1, 10]),
+                activation.forward(np.array([-10, -1, 1, 10])),
+            )
 
     def test_leaky_relu_backward(self):
         for m in [0.01, 0.1, 1]:
             activation = activations.LeakyRelu(m=m)
-            assert_array_almost_equal(np.array([m, m, 1, 1]),
-                                      activation.derivate(np.array([-10, -1, 1, 10])))
+            assert_array_almost_equal(
+                np.array([m, m, 1, 1]), activation.derivate(np.array([-10, -1, 1, 10]))
+            )

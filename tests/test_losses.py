@@ -75,5 +75,5 @@ class TestLosses(TestCase):
     def test_quantile_backward(self):
         loss = losses.Quantile(0.25)
         result = loss.derivate(actual_regression, prediction_regression)
-        expected = np.array([0.75,  0.75, -0.25, -0.25])
+        expected = np.array([0.75, 0.75, -0.25, -0.25])
         assert_array_almost_equal(expected, result)
