@@ -144,7 +144,7 @@ class Quantile(Loss):
     def forward(self, actual: np.array, prediction: np.array) -> np.array:
         """
         Compute quantile loss for an especific quantile
-        
+
         :param actual: target vector (type: np.array)
         :param prediction: predictions vector (type: np.array)
         :return: vector containing element-wise derivative of Logloss

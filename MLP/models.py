@@ -89,8 +89,8 @@ class BasicMLP(Model):
         """
         Initialize network
 
-        :param model_dict: python dictionary containing all necessary information to
-        instantiate an existing model (type: dict)
+        :param model_dict: python dictionary containing all necessary 
+        information to instantiate an existing model (type: dict)
         """
         self.reg_lambda = 0.01
         self.layers = []
@@ -150,8 +150,8 @@ class BasicMLP(Model):
     def predict(self, x: np.array) -> np.array:
         """
         Computes a forward pass and returns prediction
-        Note that this operation will not update Z and A of each weight, this must
-        only happen during train
+        Note that this operation will not update Z and A of each weight,
+        this must only happen during train
 
         :param x: input matrix to the network (type: np.array)
 
@@ -175,7 +175,8 @@ class BasicMLP(Model):
         :param loss: loss function (type: Loss)
         :param train_data: train data (type: list[np.array])
         :param optimizer: optimizar to use (type: Oprtimizer)
-        :param dev_data: data to use for early-stopping, optional (type: list[np.array])
+        :param dev_data: data to use for early-stopping, 
+        optional (type: list[np.array])
         :param params: parameters for train (type: dict)
         """
 
@@ -187,7 +188,8 @@ class BasicMLP(Model):
         Computes a forward pass though the architecture of the network
 
         :param x: input matrix to the network (type: np.array)
-        :param update: flag to update latest values through the network (type: bool)
+        :param update: flag to update latest values through the network 
+        (type: bool)
 
         :return: output of the network (type: np.array)
         """
@@ -201,8 +203,9 @@ class BasicMLP(Model):
     def back_prop(self, x: np.array, y: np.array, loss: Loss, reg_lambda=0.01):
         """
         Computes back-propagation pass through the network
-        It retrieves output of the final layer, self.layers[-1].A, and back-propagates
-        its error through the layers of the network, computing and updating its gradients
+        It retrieves output of the final layer, self.layers[-1].A, 
+        and back-propagates its error through the layers of the network, 
+        computing and updating its gradients
 
         :param x: input matrix to the network (type: np.array)
         :param y: target vector (type: np.array)
@@ -267,7 +270,8 @@ class BasicMLP(Model):
 
     def _build_architecture_from_dict(self):
         """
-        Build architecture of MLP from dict Instantiates Dense layers inside of a list
+        Build architecture of MLP from dict Instantiates Dense layers 
+        inside of a list
         """
 
         self.layers = []

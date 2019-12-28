@@ -74,7 +74,6 @@ class Dense(Layer):
         initialize=False,
         layer_dict=None,
     ):
-
         """
         Initialize layer
 
@@ -96,7 +95,8 @@ class Dense(Layer):
         if layer_dict is not None:
             self._from_dict(layer_dict)
         elif units is None or activation is None:
-            raise AttributeError("It is necessary to especify units and activation")
+            raise AttributeError(
+                "It is necessary to especify units and activation")
         else:
             self.type = "dense"
             self._activation_type = activation.type

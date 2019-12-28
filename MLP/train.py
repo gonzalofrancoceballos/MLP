@@ -89,7 +89,10 @@ class ModelTrain:
 
             # Train on batches
             for batch_i in range(self._batcher.n_batches):
-                x_batch, y_batch = self._batcher.next()
+                batch = self._batcher.next()
+                x_batch = batch[0]
+                y_batch = batch[1]
+                
                 self._train_step(
                     model, x_batch, y_batch, loss, self._train_params["reg_lambda"]
                 )

@@ -112,10 +112,12 @@ class Adam(Optimizer):
                 "mW": (self.beta_1 * layer.adam["mW"] + (1 - self.beta_1) * layer.dW),
                 "mb": (self.beta_1 * layer.adam["mb"] + (1 - self.beta_1) * layer.db),
                 "vW": (
-                    self.beta_2 * layer.adam["vW"] + (1 - self.beta_2) * layer.dW ** 2
+                    self.beta_2 * layer.adam["vW"] +
+                    (1 - self.beta_2) * layer.dW ** 2
                 ),
                 "vb": (
-                    self.beta_2 * layer.adam["vb"] + (1 - self.beta_2) * layer.db ** 2
+                    self.beta_2 * layer.adam["vb"] +
+                    (1 - self.beta_2) * layer.db ** 2
                 ),
             }
 
