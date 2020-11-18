@@ -18,13 +18,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import numpy as np
-from MLP import model_utils
+from typing import List
+from . import model_utils
 
 from abc import abstractmethod
-from MLP.layers import Dense, Layer
-from MLP.losses import Loss
-from MLP.train import ModelTrain
-from MLP.optimizers import Optimizer, Adam
+from .layers import Dense, Layer
+from .losses import Loss
+from .train import ModelTrain
+from .optimizers import Optimizer, Adam
 
 """
 TODO:
@@ -81,17 +82,17 @@ class Model:
 
 
 class BasicMLP(Model):
-    """
-    Multi-layer perceptron
-    """
+    """Multi-layer perceptron."""
 
     def __init__(self, model_dict: dict = None):
-        """
-        Initialize network
+        """Initialize network.
 
-        :param model_dict: python dictionary containing all necessary 
-        information to instantiate an existing model (type: dict)
+        Args:
+            model_dict: python dictionary containing all necessary information to
+            instantiate an existing model
+
         """
+
         self.reg_lambda = 0.01
         self.layers = []
         self.n_layers = 0
@@ -122,10 +123,13 @@ class BasicMLP(Model):
             return "Empty BasicMLP model"
 
     def add(self, layer: Layer):
-        """
-        Adds a layer to the model
+        """Adds a layer to the model.
 
-        :param layer: layer to be added (type: Layer)
+        Args:
+            layer: layer to be added
+
+        Returns:
+
         """
 
         if len(self.layers) == 0:
@@ -141,21 +145,24 @@ class BasicMLP(Model):
         self.n_layers += 1
 
     def compile(self):
-        """
-        Compiles model before train. For now, it just resets layers
+        """Compiles model before train. For now, it just resets layers.
+        For now, this is just a dummy method to reflect the same behavior as Keras.
         """
 
         self.reset_layers()
 
     def predict(self, x: np.array) -> np.array:
-        """
-        Computes a forward pass and returns prediction
+        """Computes a forward pass and returns prediction.
+
         Note that this operation will not update Z and A of each weight,
         this must only happen during train
 
-        :param x: input matrix to the network (type: np.array)
+        Args:
+            x: input matrix to the network
 
-        :return: output of the network (type: np.array)
+        Returns:
+            output of the network
+
         """
 
         pred = self.forward_prop(x, update=False)
@@ -169,29 +176,32 @@ class BasicMLP(Model):
         dev_data: list = None,
         params: dict = None,
     ):
-        """
-        Perform train operation
+        """Perform train operation.
 
-        :param loss: loss function (type: Loss)
-        :param train_data: train data (type: list[np.array])
-        :param optimizer: optimizar to use (type: Oprtimizer)
-        :param dev_data: data to use for early-stopping, 
-        optional (type: list[np.array])
-        :param params: parameters for train (type: dict)
+        Args:
+            loss: loss function
+            train_data: train data
+            optimizer: optimizar to use
+            dev_data: data to use for early-stopping
+            params: parameters for train
+
+        Returns:
+
         """
 
         self._trainer = ModelTrain()
         self._trainer.train(self, loss, train_data, optimizer, dev_data, params)
 
     def forward_prop(self, x: np.array, update: bool = True):
-        """
-        Computes a forward pass though the architecture of the network
+        """Computes one forward pass though the architecture of the network.
 
-        :param x: input matrix to the network (type: np.array)
-        :param update: flag to update latest values through the network 
-        (type: bool)
+        Args:
+            x: input matrix to the network
+            update: flag to update latest values through the network
 
-        :return: output of the network (type: np.array)
+        Returns:
+            output of the network
+
         """
 
         A = x
@@ -200,28 +210,31 @@ class BasicMLP(Model):
 
         return A
 
-    def back_prop(self, x: np.array, y: np.array, loss: Loss, reg_lambda=0.01):
-        """
-        Computes back-propagation pass through the network
-        It retrieves output of the final layer, self.layers[-1].A, 
-        and back-propagates its error through the layers of the network, 
+    def back_prop(self, x: np.array, y: np.array, loss: Loss, reg_lambda: float = 0.01):
+        """Computes back-propagation pass through the network.
+
+        It retrieves output of the final layer, self.layers[-1].A,
+        and back-propagates its error through the layers of the network,
         computing and updating its gradients
 
-        :param x: input matrix to the network (type: np.array)
-        :param y: target vector (type: np.array)
-        :param loss: loss funtion object (type: Loss)
-        :param reg_lambda: regularizatiopn factor for gradients (type: float)
+        Args:
+            x: input matrix to the network
+            y: target vector
+            loss: loss funtion object
+            reg_lambda: regularizatiopn factor for gradients
+
         """
 
         self._update_deltas(loss, y)
         self._update_gradients(x, reg_lambda)
 
     def _update_deltas(self, loss: Loss, y: np.array):
-        """
-        Starting from last layer, compute and update deltas in reverse order
+        """Starting from last layer, compute and update deltas in reverse order.
 
-        :param loss: loss function object (type: Loss)
-        :param y: target verctor (type: np.array)
+        Args:
+            loss: loss function object
+            y: target verctor
+
         """
 
         for i, layer in enumerate(reversed(self.layers)):
@@ -233,11 +246,14 @@ class BasicMLP(Model):
                 layer.update_delta(layer_next)
 
     def _update_gradients(self, x: np.array, reg_lambda: float):
-        """
-        Compute and update gradients of each layers
+        """Compute and update gradients of each layers.
 
-        :param x: feature matrix (type: np.array)
-        :param reg_lambda: regularization factor (type: float)
+        Args:
+            x: feature matrix
+            reg_lambda: regularization factor
+
+        Returns:
+
         """
 
         for i, layer in enumerate(self.layers):
@@ -249,29 +265,20 @@ class BasicMLP(Model):
             layer.update_gradients(a_in, reg_lambda)
 
     def save(self, path: str):
-        """
-        Save model to json
-
-        :param path: path to save model as json
-        """
+        """Save model to json."""
 
         model_dict = self.return_model_dict()
         model_utils.save_json(model_dict, path)
 
     def load(self, path: str):
-        """
-        Load model from json file
-
-        :param path: path to json file containing model info
-        """
+        """Load model from json file."""
 
         model_dict = model_utils.read_json(path)
         self.__init__(model_dict=model_dict)
 
     def _build_architecture_from_dict(self):
-        """
-        Build architecture of MLP from dict Instantiates Dense layers 
-        inside of a list
+        """Build architecture of MLP from dict Instantiates Dense layers inside of a
+        list.
         """
 
         self.layers = []
@@ -281,21 +288,22 @@ class BasicMLP(Model):
         self.n_layers = len(self.layers)
 
     def return_model_dict(self) -> dict:
-        """
-        Returns model information as a json
+        """Returns model information as a json.
 
-        :return: model info (type: dict)
+        Returns: model info
+
         """
 
         model_dict = {"layers": self._get_layers()}
 
         return model_dict
 
-    def _get_layers(self):
-        """
-        Return layer weights and activation type in a list of dicts
+    def _get_layers(self) -> List[Layer]:
+        """Return layer weights and activation type in a list of dicts.
 
-        :return: list of layers (type: list[dict])
+        Returns:
+            list of layers
+
         """
 
         layers = []
@@ -306,16 +314,12 @@ class BasicMLP(Model):
         return layers
 
     def reset_layers(self):
-        """
-        Resets layrers of model
-        """
+        """Resets layrers of model."""
         for layer in self.layers:
             layer.reset_layer()
 
     def plot_train(self):
-        """
-        Plot results of train operation
-        """
+        """Plot results of train operation"""
         if self.train_log is not None:
             train_log = self.train_log.copy()
             train_log["batch"] = train_log.index

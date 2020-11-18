@@ -18,20 +18,29 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import numpy as np
+from typing import List, Union
+from .tensor import Tensor
 
 
 class Batcher:
-    """
-    Batcher class. Given a list of np.arrays of same 0-dimension, returns a
-    a list of batches for these elements
+    """Batcher class. Given a list of np.arrays of same 0-dimension, returns a
+    a list of batches for these elements.
     """
 
-    def __init__(self, data, batch_size, shuffle_on_reset=False):
+    def __init__(
+        self,
+        data: Union[List[Tensor], Tensor],
+        batch_size: int,
+        shuffle_on_reset: bool = False,
+    ):
         """
-        :param data: list containing np.arrays (type: list[np.array])
-        :param batch_size: size of each batch (type: int)
-        :param shuffle_on_reset: flag to shuffle data (type: bool)
+
+        Args:
+            data: list containing np.arrays
+            batch_size: size of each batch
+            shuffle_on_reset: flag to shuffle data
         """
+
         self.data = data
         self.batch_size = batch_size
         self.shuffle_on_reset = shuffle_on_reset
@@ -47,26 +56,26 @@ class Batcher:
         self.current = 0
 
     def shuffle(self):
-        """
-        Re-shufle the data
-        """
+        """Re-shufle the data."""
         np.random.shuffle(self.idx)
 
     def reset(self):
-        """
-        Reset iteration counter
-        """
+        """Reset iteration counter."""
+
         if self.shuffle_on_reset:
             self.shuffle()
         self.current = 0
 
     def next(self):
+        """Get next batch.
+
+        Returns:
+            list of np.arrays
+
         """
-        Get next batch
-        :return: list of np.arrays
-        """
+
         i_select = self.idx[
-            (self.current * self.batch_size): ((self.current + 1) * self.batch_size)
+            (self.current * self.batch_size) : ((self.current + 1) * self.batch_size)
         ]
         batch = []
         for elem in self.data:

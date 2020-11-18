@@ -1,9 +1,9 @@
-from MLP import models
+from src import models
 import numpy as np
 import pandas as pd
-from MLP.layers import Dense
-from MLP.activations import Sigmoid, Relu, Linear
-from MLP.losses import Logloss, MSE, Quantile
+from src.layers import Dense
+from src.activations import Sigmoid, Relu, Linear
+from src.losses import Logloss, MSE, Quantile
 
 
 """
@@ -16,10 +16,10 @@ def f(x):
     """
     Simple function
     f(x0,x1,x2) = x0 + 2*x1 - x2**2
-    
+
     :param x: input matrix with columns x0, x1, x2 (type: np.array)
-    :return: f(X) (type: np.array) 
-    
+    :return: f(X) (type: np.array)
+
     """
     res = x[:, 0] + 2 * x[:, 1] - x[:, 2] ** 2
     res = res.reshape([-1, 1])

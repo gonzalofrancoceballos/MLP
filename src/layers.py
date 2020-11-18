@@ -19,22 +19,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy as np
 
-from MLP.initializers import Glorot
-from MLP.helpers import assign_activation
 from abc import abstractmethod
+from .initializers import Initializer, Glorot
+from .helpers import assign_activation
+from .activations import Activation
+from .tensor import Tensor
 
 
 class Layer:
-    """
-    Base class for layer
-    """
+    """Base class for layer."""
 
     @abstractmethod
     def reset_layer(self, **kwargs):
         pass
 
     @abstractmethod
-    def forward(self, x: np.array) -> np.array:
+    def forward(self, x: Tensor) -> Tensor:
         pass
 
     @abstractmethod
@@ -50,38 +50,40 @@ class Layer:
         pass
 
     @abstractmethod
-    def update_gradients(self, a_in: np.array, reg_lambda: float):
+    def update_gradients(self, a_in: Tensor, reg_lambda: float):
         pass
 
 
 class Dense(Layer):
-    """
-    Class that implements a dense layer
-    Z = vector_product(X,W) + b
-    A = activation(Z)
+    """Class that implements a dense layer.
+        Z = vector_product(X,W) + b
+        A = activation(Z)
     where:
-    X: input matrix of shape [m,input_dim]
-    W: weights matrix of shape [input_dim, output_dim]
-    b: bias vector of size [1, output_dim]
+        X: input matrix of shape [m,input_dim]
+        W: weights matrix of shape [input_dim, output_dim]
+        b: bias vector of size [1, output_dim]
     """
 
     def __init__(
         self,
-        units=None,
-        activation=None,
-        input_dim=None,
-        kernel_initializer=Glorot(),
-        initialize=False,
-        layer_dict=None,
+        units: int = None,
+        activation: Activation = None,
+        input_dim: int = None,
+        kernel_initializer: Initializer = Glorot(),
+        initialize: bool = False,
+        layer_dict: dict = None,
     ):
-        """
-        Initialize layer
+        """Initialize layer.
 
-        :param units: output size of the layer (type: int)
-        :param input_dim: input dimension of the layer. If none, they will be inferred
-        by the modelfrom the previous layer (type: int)
-        :param activation: activation function of the layer (type: str)
-        :param initialize: flag to initialize weights (type: bool)
+        Args:
+            units: output size of the layer
+            activation: activation function of the layer
+            input_dim: input dimension of the layer. If none, they will be inferred by
+                the modelfrom the previous layer
+            initialize: flag to initialize weights
+            kernel_initializer: weights inicializer object
+            layer_dict: dict containing lyer weights. This is used to load a prevuously
+                saved model
         """
 
         self.W = None
@@ -95,11 +97,10 @@ class Dense(Layer):
         if layer_dict is not None:
             self._from_dict(layer_dict)
         elif units is None or activation is None:
-            raise AttributeError(
-                "It is necessary to especify units and activation")
+            raise AttributeError("It is necessary to especify units and activation")
         else:
-            self.type = "dense"
-            self._activation_type = activation.type
+            self.layer_type = "dense"
+            self._activation_type = activation.activation_type
             self.activation = activation
             self.input_dim = input_dim
             self.output_dim = units
@@ -110,33 +111,33 @@ class Dense(Layer):
 
     def __repr__(self):
         return "[{}|{}] shape: {}\n".format(
-            self.type, self.activation.type, self._get_shape()
+            self.layer_type, self.activation.activation_type, self._get_shape()
         )
 
     def __str__(self):
         return "[{}|{}] shape: {}\n".format(
-            self.type, self.activation.type, self._get_shape()
+            self.layer_type, self.activation.activation_type, self._get_shape()
         )
 
     def reset_layer(self):
-        """
-        Reset weights, bias and gradients of the layer
-        """
+        """Reset weights, bias and gradients of the layer."""
         W, b, dW, db = self.initializer.initialize(self)
         self.W = W
         self.b = b
         self.dW = dW
         self.db = db
 
-    def forward(self, x: np.array, update: bool = True) -> np.array:
-        """
-        Forward pass through layer
+    def forward(self, x: Tensor, update: bool = True) -> Tensor:
+        """Forward pass through layer.
 
-        :param x: input matrix to the layer (type: np.array)
-        :param update: flag to update outputs Z and A. These values need to be 
-        cached during train to compute the back-propagation pass
+        Args:
+            x: input matrix to the layer
+            update: update: flag to update outputs Z and A. These values need to be
+                cached during train to compute the back-propagation pass
 
-        :return: result of forward operation (type: np.array)
+        Returns:
+            result of forward operation
+
         """
 
         Z = np.matmul(x, self.W) + self.b
@@ -147,10 +148,13 @@ class Dense(Layer):
         return A
 
     def update_delta(self, next_layer):
-        """
-        Computes and updates delta in back-propagation
+        """Computes and updates delta in back-propagation.
 
-        :param next_layer: next layer (type: Layer)
+        Args:
+            next_layer: next layer
+
+        Returns:
+
         """
 
         delta = np.matmul(next_layer.delta, next_layer.W.T) * self.activation.derivate(
@@ -159,11 +163,14 @@ class Dense(Layer):
         self.delta = delta
 
     def update_gradients(self, a_in, reg_lambda):
-        """
-        Computes and updates gradients in back-propagation
+        """Computes and updates gradients in back-propagation.
 
-        :param a_in: input matrix to the layer (type: np.array)
-        :param reg_lambda: regularization factor (type: float)
+        Args:
+            a_in: input matrix to the layer
+            reg_lambda: regularization factor
+
+        Returns:
+
         """
 
         delta_out = self.delta
@@ -173,25 +180,20 @@ class Dense(Layer):
 
     def to_dict(self):
         layer_dict = {
-            "type": self.type,
+            "type": self.layer_type,
             "W": self.W.tolist(),
             "b": self.b.tolist(),
-            "activation": self.activation.type,
+            "activation": self.activation.activation_type,
         }
 
         return layer_dict
 
-    def _from_dict(self, layer_dict):
-        """
-        Populates weights from dict
+    def _from_dict(self, layer_dict: dict):
+        """Populates weights from dict."""
 
-        :param layer_dict:
-        :return:
-        """
-
-        self.type = layer_dict["type"]
-        self.W = np.array(layer_dict["W"])
-        self.b = np.array(layer_dict["b"])
+        self.layer_type = layer_dict["type"]
+        self.W = Tensor(layer_dict["W"])
+        self.b = Tensor(layer_dict["b"])
         self.activation = assign_activation(layer_dict["activation"])
 
     def _get_shape(self):
