@@ -26,6 +26,11 @@ class Optimizer:
     Base class for optimizer
     """
 
+    @property
+    @abstractmethod
+    def optimizier_type(self):
+        pass
+
     @abstractmethod
     def update_weights(self, layers):
         pass
@@ -46,17 +51,25 @@ class GradientDescent(Optimizer):
         :param learning_rate: learning rate of each iteration (type: float)
         """
         self.learning_rate = learning_rate
-        self.type = "gradient_descent"
+
+    @property
+    def optimizier_type(self):
+        return "gradient_descent"
 
     def initialize_parameters(self, layers):
         return layers
 
     def update_weights(self, layers):
+        """Perform update rule.
+
+        Args:
+            layers: layers to update in the model
+
+        Returns:
+            layers with updated weights
+
         """
-        Perform update rule
-        :param layers: layers of the MLP to update (type: list[Dense()])
-        :return: layers with updated weights (type: list[Dense()])
-        """
+
         for i in range(len(layers)):
             layers[i].W = layers[i].W - self.learning_rate * layers[i].dW
             layers[i].b = layers[i].b - self.learning_rate * layers[i].db
@@ -65,29 +78,36 @@ class GradientDescent(Optimizer):
 
 
 class Adam(Optimizer):
-    """
-    Implements Adam optimizer
-    """
+    """Implements Adam optimizer."""
 
     def __init__(self, learning_rate=0.001):
+        """Initialize optimizer.
+
+        Args:
+            learning_rate: learning rate of each iteration
         """
-        Initialize optimizer
-        :param learning_rate: learning rate of each iteration (type: float)
-        """
-        self.type = "adam"
+
         self.learning_rate = learning_rate
         self.beta_1 = 0.9
         self.beta_2 = 0.999
         self.epsilon = 1e-8
         self.t = 1
 
-    def initialize_parameters(self, layers):
-        """
-        Initializes momemtum and velocity parameters for each layer of MLP
+    @property
+    def optimizier_type(self):
+        return "adam"
 
-        :param layers: layers of the MLP (type: list[Dense()])
-        :return: layers with initialized parameters (type: list[Dense()])
+    def initialize_parameters(self, layers: list) -> list:
+        """Initializes momemtum and velocity parameters for each layer of the model
+
+        Args:
+            layers: layers of the model
+
+        Returns:
+            layers with initialized parameters
+
         """
+
         for i, layer in enumerate(layers):
             adam = {
                 "mW": np.zeros([layer.input_dim, layer.output_dim]),
@@ -99,11 +119,14 @@ class Adam(Optimizer):
         return layers
 
     def update_weights(self, layers: list) -> list:
-        """
-        Perform update rule
-        :param layers: layers of the MLP to update (type: list[Dense()])
+        """Perform update rule/
 
-        :return: layers with updated weights (type: list[Dense()])
+        Args:
+            layers: layers of the model to update
+
+        Returns:
+            layers with updated weights
+
         """
 
         t = self.t
@@ -112,12 +135,10 @@ class Adam(Optimizer):
                 "mW": (self.beta_1 * layer.adam["mW"] + (1 - self.beta_1) * layer.dW),
                 "mb": (self.beta_1 * layer.adam["mb"] + (1 - self.beta_1) * layer.db),
                 "vW": (
-                    self.beta_2 * layer.adam["vW"] +
-                    (1 - self.beta_2) * layer.dW ** 2
+                    self.beta_2 * layer.adam["vW"] + (1 - self.beta_2) * layer.dW ** 2
                 ),
                 "vb": (
-                    self.beta_2 * layer.adam["vb"] +
-                    (1 - self.beta_2) * layer.db ** 2
+                    self.beta_2 * layer.adam["vb"] + (1 - self.beta_2) * layer.db ** 2
                 ),
             }
 

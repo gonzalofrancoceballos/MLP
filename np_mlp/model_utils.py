@@ -17,35 +17,48 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-import numpy as np
 import json
+import numpy as np
+from .tensor import Tensor
 
 
-def sigmoid(x):
+def sigmoid(x: Tensor) -> Tensor:
+    """Sigmoid function.
+
+    Args:
+        x: input tensor
+
+    Returns:
+        result of applying sigmoid function element-wise
+
     """
-    Sigmoid function
-    :param x: input matrix (type:np.array)
-    :output: result of applying sigmoid functin element-wise
-    """
+
     return 1.0 / (1.0 + np.exp(-x))
 
 
-def read_json(file):
+def read_json(file: str) -> dict:
+    """Wrapper function to read json file into a python dictionary.
+
+    Args:
+        file: path to json file
+
+    Returns:
+        content of json file
+
     """
-    Wrapper function to read json file into a python dictionary
-    :param file: path to json file
-    :return: content of json file (type: dict)
-    """
+
     with open(file) as f:
         data = json.load(f)
     return data
 
 
-def save_json(dict_object, file):
-    """
-    Wraper function to save a dictionary as a json file
-    :param dict_object: python dictionary to save
-    :param file: path to json file
+def save_json(dict_object: dict, file: str):
+    """Wraper function to save a dictionary as a json file.
+
+    Args:
+        dict_object: python dictionary to save
+        file: path to json file
+
     """
 
     with open(file, "w") as fp:
@@ -53,14 +66,9 @@ def save_json(dict_object, file):
 
 
 class DummyLogger:
-    """
-    Dummy print function wrapper that is called like a logger
-    """
+    """Dummy print function wrapper that is called like a logger."""
 
     def __init__(self):
-        """
-        Initialize object
-        """
         self.info = print
         self.warn = print
         self.warning = print

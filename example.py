@@ -1,9 +1,28 @@
-from MLP import models
+"""
+This file is part of MLP project <github.com/gonzalofrancoceballos/MLP>
+Simple and light-weight implementation of a Multi-Layer Perceptron using Numpy
+
+Copyright 2019 Gonzalo Franco Ceballos <gonzalofrancoceballos@gmail.com>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
+from np_mlp import models
 import numpy as np
 import pandas as pd
-from MLP.layers import Dense
-from MLP.activations import Sigmoid, Relu, Linear
-from MLP.losses import Logloss, MSE, Quantile
+from np_mlp.layers import Dense
+from np_mlp.activations import Sigmoid, Relu, Linear
+from np_mlp.losses import Logloss, MSE, Quantile
 
 
 """
@@ -16,10 +35,10 @@ def f(x):
     """
     Simple function
     f(x0,x1,x2) = x0 + 2*x1 - x2**2
-    
+
     :param x: input matrix with columns x0, x1, x2 (type: np.array)
-    :return: f(X) (type: np.array) 
-    
+    :return: f(X) (type: np.array)
+
     """
     res = x[:, 0] + 2 * x[:, 1] - x[:, 2] ** 2
     res = res.reshape([-1, 1])

@@ -20,10 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import numpy as np
 import pandas as pd
 
-from MLP.data_processing import Batcher
-from MLP.losses import Loss
-from MLP.optimizers import Optimizer
-from MLP.optimizers import Adam
+from .data_processing import Batcher
+from .losses import Loss
+from .optimizers import Optimizer
+from .optimizers import Adam
+from .tensor import Tensor
 
 default_params = {
     "n_epoch": 10,  # number of epochs
@@ -54,15 +55,16 @@ class ModelTrain:
         dev_data: list = None,
         params: dict = None,
     ):
-        """
-        Run several train steps
+        """Run several train steps.
 
-        :param model: model to uptimize on (type: Model)
-        :param loss: loss function object (type: Loss)
-        :param train_data: train dataset containing x,y pair (type: list[np.array])
-        :param optimizer: optimizer to use in train (type: Optimizer)
-        :param dev_data: train dataset containing x_dev,y_dev pair (type: list[np.array])
-        :param params: train parameters (type: dict)
+        Args:
+            model: model to uptimize on
+            loss: loss function object
+            train_data: train dataset containing x,y pair
+            optimizer: optimizer to use in train
+            dev_data: train dataset containing x_dev,y_dev pair
+            params: train parameters
+
         """
 
         self._update_params(params)
@@ -81,9 +83,9 @@ class ModelTrain:
         model.train_log = []
         model.dev_log = []
         train_loss = []
-        while (
-            epoch <= self._train_params["n_epoch"]
-            and early_stopping_counter < self._train_params["n_stopping_rounds"]
+        while epoch <= self._train_params["n_epoch"] and (
+            early_stopping_counter < self._train_params["n_stopping_rounds"]
+            or not self._train_params["early_stopping"]
         ):
             self._batcher.reset()
 
@@ -92,13 +94,13 @@ class ModelTrain:
                 batch = self._batcher.next()
                 x_batch = batch[0]
                 y_batch = batch[1]
-                
+
                 self._train_step(
                     model, x_batch, y_batch, loss, self._train_params["reg_lambda"]
                 )
                 loss_i = self._compute_loss(model.layers[-1].A, y_batch, loss)
                 train_loss.append(loss_i)
-                model.train_log.append(np.array([epoch, batch_i, loss_i]))
+                model.train_log.append(Tensor([epoch, batch_i, loss_i]))
 
             # Evaluate dev data
             if dev_data is not None:
@@ -128,16 +130,23 @@ class ModelTrain:
             model.dev_log = pd.DataFrame(model.dev_log, columns=["epoch", "loss"])
 
     def _train_step(
-        self, model, x: np.array, y: np.array, loss: Loss, reg_lambda: float = 0.01
+        self, model, x: Tensor, y: Tensor, loss: Loss, reg_lambda: float = 0.01
     ):
-        """
-        Performs a complete train step of the network
-        (1) Forward pass: computes Z and A for each layer
-        (2) Back propagation: computes gradients for each layer
-        (3) Update weights: call optimizer to perform update rule
+        """Performs a complete train step of the network.
 
-        :param x: input matrix to the network (type: np.array)
-        :param y: target vector (type: np.array)
+            (1) Forward pass: computes Z and A for each layer
+            (2) Back propagation: computes gradients for each layer
+            (3) Update weights: call optimizer to perform update rule
+
+        Args:
+            model: model to train
+            x: input matrix to the network
+            y: target vector
+            loss: loss function
+            reg_lambda: regularization factor
+
+        Returns:
+
         """
 
         # Forward propagation
@@ -150,20 +159,21 @@ class ModelTrain:
         model.layers = self._optimizer.update_weights(model.layers)
 
     @staticmethod
-    def _compute_loss(actual: np.array, prediction: np.array, loss: Loss) -> np.array:
-        """
-        Computes loss between prediction and target
+    def _compute_loss(actual: Tensor, prediction: Tensor, loss: Loss) -> float:
+        """Computes loss between prediction and target.
 
-        :param actual: target vector (type: np.array)
-        :param prediction: predictions vector (type: np.array)
-        :param loss: loss function ibject (type: Loss)
+        Args:
+            actual: target vector
+            prediction: predictions vector
+            loss: oss function object
 
-        :return: average loss (type: float)
+        Returns:
+            average loss
+
         """
 
         current_loss = loss.forward(actual, prediction)
-        current_loss = np.mean(current_loss)
-        return current_loss
+        return current_loss.mean()
 
     def _update_params(self, params: dict):
         if params is not None:
@@ -191,6 +201,6 @@ class ModelTrain:
             early_stopping_counter += 1
         if verbose and (epoch % self._train_params["print_rate"] == 0):
             print(
-                f"epoch: {epoch} | train_loss: {np.mean(train_loss)} |  dev_loss: {dev_loss}"
+                f"epoch: {epoch} | train_loss: {train_loss.mean()} |  dev_loss: {dev_loss}"
             )
         return early_stopping_counter, best_loss

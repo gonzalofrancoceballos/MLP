@@ -17,16 +17,18 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from MLP import activations, losses, optimizers
+from . import activations, losses, optimizers
 
 
-def assign_activation(type: str) -> activations.Activation:
-    """
-    Returns actiavtion function given type
+def assign_activation(activation_type: str) -> activations.Activation:
+    """Returns actiavtion function given type.
 
-    :param type: type of activation funciton (type: str)
+    Args:
+        activation_type: type of activation function
 
-    :return: actiavtion function (type: Activation)
+    Returns:
+        activation function
+
     """
 
     options = {
@@ -38,16 +40,18 @@ def assign_activation(type: str) -> activations.Activation:
         "linear": activations.Linear(),
     }
 
-    return options[type]
+    return options[activation_type]
 
 
-def assign_loss(type: str) -> losses.Loss:
-    """
-    Returns loss function given type
+def assign_loss(loss_type: str) -> losses.Loss:
+    """Returns loss function given type.
 
-    :param type: type of loss funciton (type: str)
+    Args:
+        loss_type: type of loss funciton
 
-    :return: loss function (type: Loss)
+    Returns:
+        loss function
+
     """
 
     options = {
@@ -57,16 +61,18 @@ def assign_loss(type: str) -> losses.Loss:
         "quantile": losses.Quantile(),
     }
 
-    return options[type]
+    return options[loss_type]
 
 
-def assign_optimizer(type: str) -> optimizers.Optimizer:
-    """
-    Returns optimizer given type
+def assign_optimizer(optimizer_type: str) -> optimizers.Optimizer:
+    """Returns optimizer given type.
 
-    :param type: type of optimizer (type: str)
+    Args:
+        optimizer_type: type of optimizer
 
-    :return: optimizer object (type: Optimizer )
+    Returns:
+        optimizer object
+
     """
 
     options = {
@@ -74,4 +80,4 @@ def assign_optimizer(type: str) -> optimizers.Optimizer:
         "adam": optimizers.Adam(),
     }
 
-    return options[type]
+    return options[optimizer_type]

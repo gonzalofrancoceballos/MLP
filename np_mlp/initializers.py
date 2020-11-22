@@ -28,6 +28,8 @@ class Initializer:
 
 
 class Rand(Initializer):
+    """Implements a random weight initializer."""
+
     def initialize(self, layer) -> tuple:
         W = np.random.rand(layer.input_dim, layer.output_dim)
         b = np.random.rand(1, layer.output_dim)
@@ -37,8 +39,10 @@ class Rand(Initializer):
 
 
 class Glorot(Initializer):
+    """Implements Gorot weight initializer."""
+
     def initialize(self, layer) -> tuple:
-        if layer.activation.type == "relu":
+        if layer.activation.activation_type == "relu":
             W = np.random.normal(0, size=[layer.input_dim, layer.output_dim]) * np.sqrt(
                 2 / layer.input_dim
             )

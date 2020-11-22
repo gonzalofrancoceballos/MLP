@@ -17,4 +17,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-from MLP import activations, initializers, layers, losses, models, optimizers, train
+
+import numpy as np
+
+
+Tensor = np.array
