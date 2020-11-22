@@ -83,9 +83,9 @@ class ModelTrain:
         model.train_log = []
         model.dev_log = []
         train_loss = []
-        while (
-            epoch <= self._train_params["n_epoch"]
-            and early_stopping_counter < self._train_params["n_stopping_rounds"]
+        while epoch <= self._train_params["n_epoch"] and (
+            early_stopping_counter < self._train_params["n_stopping_rounds"]
+            or not self._train_params["early_stopping"]
         ):
             self._batcher.reset()
 
