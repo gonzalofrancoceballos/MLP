@@ -1,8 +1,11 @@
 __pycache__/
+*.egg-info/
+# jupyter stuff
 .ipynb_checkpoints/
 .ipynb_checkpoints
 *.ipynb
-.Rhistory
 notebooks/
+# PyCharm stuff
 .idea/
+# VSCode stuff
 .vscode/
