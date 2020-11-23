@@ -27,17 +27,6 @@ from .losses import Loss
 from .train import ModelTrain
 from .optimizers import Optimizer, Adam
 
-"""
-TODO:
-- Save train log
-- Auto-save best train when using cross-validation
-- Keep trainlog
-- 2D Conv layer
-- 3D Conv layer
-- Flatten layer
-- Concat layer
-"""
-
 
 class Model:
     """
