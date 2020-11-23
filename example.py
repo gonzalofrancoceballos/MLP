@@ -68,11 +68,17 @@ model.add(Dense(units=4, activation=Relu()))
 model.add(Dense(units=4, activation=Relu()))
 model.add(Dense(units=1, activation=Linear()))
 
-# Model train
-params = {"learning_rate": 0.001, "n_epoch": 100, "print_rate": 10}
+# Model train with dev set
+params = {
+    "learning_rate": 0.001,
+    "n_epoch": 100,
+    "print_rate": 10,
+    "n_stopping_rounds": 15,
+    "early_stopping": True,
+}
 loss = MSE()
 print(model.layers)
-model.train(loss, train_data=[X, y], params=params)
+model.train(loss, train_data=[X, y], dev_data=[X_dev, y_dev], params=params)
 
 # Run predict on new data
 predictions = model.predict(X_pred)

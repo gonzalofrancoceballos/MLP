@@ -201,6 +201,6 @@ class ModelTrain:
             early_stopping_counter += 1
         if verbose and (epoch % self._train_params["print_rate"] == 0):
             print(
-                f"epoch: {epoch} | train_loss: {train_loss.mean()} |  dev_loss: {dev_loss}"
+                f"epoch: {epoch} | train_loss: {np.mean(train_loss)} |  dev_loss: {dev_loss}"
             )
         return early_stopping_counter, best_loss
