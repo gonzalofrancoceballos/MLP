@@ -1,4 +1,10 @@
 # MLP project
+
+[![Python Version](https://img.shields.io/badge/python-3.5%20%7C%203.6%20%7C%203.7%20%7C%203.8-blue.svg)](https://pypi.org/project/np-mlp/)
+[![PyPI version](https://badge.fury.io/py/np-mlp.svg)](https://pypi.org/project/np-mlp/)
+[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
+[![Code Style: Black](https://img.shields.io/badge/code%20style-black-black.svg)](https://github.com/ambv/black)
+
 Simple and light-weight implementation of a Multi-Layer Perceptron library using only Numpy
 
 
@@ -66,8 +72,8 @@ mlp.load("model.json")
 - `n_epoch`: number of epochs (default: 10)
 - `batch_size`: batch size (default: 128)
 - `n_stopping_rounds`: N of consecutive epochs without improvement for early-stopping (default: 10)
-- `learning_rate`:1,  # learning rate (default: 0)
-- `reg_lambda`:  # regularization factor for gradients (default: 0)
+- `learning_rate`: learning rate (default: 0)
+- `reg_lambda`: regularization factor for gradients (default: 0)
 - `verbose`: flag to plot train  results (default: True)
 - `print_rate`: print train results every print_rate epochs (default: 5)
 - `early_stopping`: flag to use early-stopping (default: False)
