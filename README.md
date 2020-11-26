@@ -1,4 +1,10 @@
 # MLP project
+
+[![Python Version](https://img.shields.io/badge/python-3.5%20%7C%203.6%20%7C%203.7%20%7C%203.8-blue.svg)](https://pypi.org/project/np-mlp/)
+[![PyPI version](https://badge.fury.io/py/np-mlp.svg)](https://pypi.org/project/np-mlp/)
+[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
+[![Code Style: Black](https://img.shields.io/badge/code%20style-black-black.svg)](https://github.com/ambv/black)
+
 Simple and light-weight implementation of a Multi-Layer Perceptron library using only Numpy
 
 
