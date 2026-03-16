@@ -79,7 +79,7 @@ class Dense(Layer):
             units: output size of the layer
             activation: activation function of the layer
             input_dim: input dimension of the layer. If none, they will be inferred by
-                the modelfrom the previous layer
+                the model from the previous layer
             initialize: flag to initialize weights
             kernel_initializer: weights initializer object
             layer_dict: dict containing layer weights. This is used to load a previously
@@ -97,7 +97,7 @@ class Dense(Layer):
         if layer_dict is not None:
             self._from_dict(layer_dict)
         elif units is None or activation is None:
-            raise AttributeError("It is necessary to especify units and activation")
+            raise AttributeError("It is necessary to specify units and activation")
         else:
             if not isinstance(units, int) or units <= 0:
                 raise ValueError(f"units must be a positive integer, got {units}")
@@ -136,7 +136,7 @@ class Dense(Layer):
 
         Args:
             x: input matrix to the layer
-            update: update: flag to update outputs Z and A. These values need to be
+            update: flag to update outputs Z and A. These values need to be
                 cached during train to compute the back-propagation pass
 
         Returns:
@@ -199,6 +199,8 @@ class Dense(Layer):
         self.W = Tensor(layer_dict["W"])
         self.b = Tensor(layer_dict["b"])
         self.activation = assign_activation(layer_dict["activation"])
+        self.input_dim = self.W.shape[0]
+        self.output_dim = self.W.shape[1]
 
     def _get_shape(self):
         return [self.input_dim, self.output_dim]

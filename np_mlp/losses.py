@@ -104,7 +104,7 @@ class MAE(Loss):
 
         Args:
             actual: target vector
-            prediction: vector containing element-wise derivative of MSE
+            prediction: predictions vector
 
         Returns:
            vector containing element-wise derivative of MAE
@@ -130,7 +130,7 @@ class Logloss(Loss):
         return "logloss"
 
     def forward(self, actual: Tensor, prediction: Tensor) -> Tensor:
-        """Compute Logloss error between targt and prediction.
+        """Compute Logloss error between target and prediction.
 
         Args:
             actual: target vector
@@ -141,7 +141,7 @@ class Logloss(Loss):
 
         """
 
-        # Clip prediction to avioid 0 and 1
+        # Clip prediction to avoid 0 and 1
         prediction = np.clip(prediction, self._eps, 1 - self._eps)
 
         return -(actual * np.log(prediction) + (1 - actual) * np.log(1 - prediction))
@@ -158,7 +158,7 @@ class Logloss(Loss):
 
         """
 
-        # Clip prediction to avioid 0 and 1
+        # Clip prediction to avoid 0 and 1
         prediction = np.clip(prediction, self._eps, 1 - self._eps)
         return -(actual / prediction) + ((1 - actual) / (1 - prediction))
 
@@ -170,7 +170,7 @@ class Quantile(Loss):
         """Initialize quantile loss object.
 
         Args:
-            q: quantile for which we want to cumpute the loss
+            q: quantile for which we want to compute the loss
         """
 
         self.q = q

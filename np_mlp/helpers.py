@@ -21,7 +21,7 @@ from . import activations, losses, optimizers
 
 
 def assign_activation(activation_type: str) -> activations.Activation:
-    """Returns actiavtion function given type.
+    """Returns activation function given type.
 
     Args:
         activation_type: type of activation function
@@ -48,7 +48,7 @@ def assign_loss(loss_type: str) -> losses.Loss:
     """Returns loss function given type.
 
     Args:
-        loss_type: type of loss funciton
+        loss_type: type of loss function
 
     Returns:
         loss function

@@ -124,7 +124,7 @@ class BasicMLP(Model):
         if len(self.layers) == 0:
             if layer.input_dim is None:
                 raise AttributeError(
-                    "It is necessary to especify input dim for first layer"
+                    "It is necessary to specify input dim for first layer"
                 )
         else:
             layer.input_dim = self.layers[-1].output_dim
@@ -170,7 +170,7 @@ class BasicMLP(Model):
         Args:
             loss: loss function
             train_data: train data
-            optimizer: optimizar to use
+            optimizer: optimizer to use
             dev_data: data to use for early-stopping
             params: parameters for train
 
@@ -210,7 +210,7 @@ class BasicMLP(Model):
             x: input matrix to the network
             y: target vector
             loss: loss funtion object
-            reg_lambda: regularizatiopn factor for gradients
+            reg_lambda: regularization factor for gradients
 
         """
 
@@ -303,7 +303,7 @@ class BasicMLP(Model):
         return layers
 
     def reset_layers(self):
-        """Resets layrers of model."""
+        """Resets layers of model."""
         for layer in self.layers:
             layer.reset_layer()
 

@@ -98,7 +98,7 @@ class Adam(Optimizer):
         return "adam"
 
     def initialize_parameters(self, layers: list) -> list:
-        """Initializes momemtum and velocity parameters for each layer of the model
+        """Initializes momentum and velocity parameters for each layer of the model
 
         Args:
             layers: layers of the model

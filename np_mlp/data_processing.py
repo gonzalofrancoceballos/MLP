@@ -59,7 +59,7 @@ class Batcher:
         self.current = 0
 
     def shuffle(self):
-        """Re-shufle the data."""
+        """Re-shuffle the data."""
         np.random.shuffle(self.idx)
 
     def reset(self):
