@@ -39,7 +39,7 @@ class Rand(Initializer):
 
 
 class Glorot(Initializer):
-    """Implements Gorot weight initializer."""
+    """Implements Glorot weight initializer."""
 
     def initialize(self, layer) -> tuple:
         if layer.activation.activation_type == "relu":

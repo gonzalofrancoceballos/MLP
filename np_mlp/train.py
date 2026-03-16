@@ -192,7 +192,7 @@ class ModelTrain:
     ):
         x_dev, y_dev = dev_data
         dev_pred = model.predict(x_dev)
-        dev_loss = self._compute_loss(dev_pred, y_dev, loss)
+        dev_loss = self._compute_loss(y_dev, dev_pred, loss)
         model.dev_log.append(np.array([epoch, dev_loss]))
         if best_loss > dev_loss:
             early_stopping_counter = 0
