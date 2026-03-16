@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
 import numpy as np
-from src import activations
+from np_mlp import activations
 from numpy.testing import assert_array_almost_equal
 
 

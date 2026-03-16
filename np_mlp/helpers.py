@@ -38,6 +38,7 @@ def assign_activation(activation_type: str) -> activations.Activation:
         "leaky_relu": activations.LeakyRelu(),
         "tanh": activations.Tanh(),
         "linear": activations.Linear(),
+        "softmax": activations.Softmax(),
     }
 
     return options[activation_type]

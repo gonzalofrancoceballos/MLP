@@ -66,7 +66,8 @@ class Sigmoid(Activation):
         Returns:
 
         """
-        return (1 - self.forward(x)) * self.forward(x)
+        s = self.forward(x)
+        return s * (1 - s)
 
 
 class Swish(Activation):
@@ -74,7 +75,7 @@ class Swish(Activation):
 
     @property
     def activation_type(self):
-        return "swis"
+        return "swish"
 
     @staticmethod
     def _sigmoid_p(x):
@@ -236,7 +237,7 @@ class Linear(Activation):
             result of the operation
 
         """
-        return 1
+        return np.ones_like(x)
 
 
 class Softmax(Activation):
@@ -269,4 +270,5 @@ class Softmax(Activation):
             result of the operation
 
         """
-        return (1 - self.forward(x)) * self.forward(x)
+        s = self.forward(x)
+        return s * (1 - s)

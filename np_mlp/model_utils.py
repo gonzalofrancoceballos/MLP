@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import json
+import os
 import numpy as np
 from .tensor import Tensor
 
@@ -47,6 +48,8 @@ def read_json(file: str) -> dict:
 
     """
 
+    if not os.path.exists(file):
+        raise FileNotFoundError(f"Model file not found: {file}")
     with open(file) as f:
         data = json.load(f)
     return data

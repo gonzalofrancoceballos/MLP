@@ -81,8 +81,8 @@ class Dense(Layer):
             input_dim: input dimension of the layer. If none, they will be inferred by
                 the modelfrom the previous layer
             initialize: flag to initialize weights
-            kernel_initializer: weights inicializer object
-            layer_dict: dict containing lyer weights. This is used to load a prevuously
+            kernel_initializer: weights initializer object
+            layer_dict: dict containing layer weights. This is used to load a previously
                 saved model
         """
 
@@ -99,6 +99,10 @@ class Dense(Layer):
         elif units is None or activation is None:
             raise AttributeError("It is necessary to especify units and activation")
         else:
+            if not isinstance(units, int) or units <= 0:
+                raise ValueError(f"units must be a positive integer, got {units}")
+            if input_dim is not None and (not isinstance(input_dim, int) or input_dim <= 0):
+                raise ValueError(f"input_dim must be a positive integer, got {input_dim}")
             self.layer_type = "dense"
             self._activation_type = activation.activation_type
             self.activation = activation

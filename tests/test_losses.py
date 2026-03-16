@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import numpy as np
-from src import losses
+from np_mlp import losses
 from unittest import TestCase
 from numpy.testing import assert_array_almost_equal
 

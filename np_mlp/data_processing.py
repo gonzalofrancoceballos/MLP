@@ -41,11 +41,14 @@ class Batcher:
             shuffle_on_reset: flag to shuffle data
         """
 
+        if batch_size <= 0:
+            raise ValueError(f"batch_size must be a positive integer, got {batch_size}")
+
         self.data = data
         self.batch_size = batch_size
         self.shuffle_on_reset = shuffle_on_reset
 
-        if type(data) == list:
+        if isinstance(data, list):
             self.data_size = data[0].shape[0]
         else:
             self.data_size = data.shape[0]
