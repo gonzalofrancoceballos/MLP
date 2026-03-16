@@ -79,11 +79,11 @@ mlp.load("model.json")
 - `early_stopping`: flag to use early-stopping (default: False)
 
 ## Authors
-* **Gonzalo Franco** - [Github](https:///github.com/gonzalofrancoceballos)
+* **Gonzalo Franco** - [Github](https://github.com/gonzalofrancoceballos)
 
 
 ## License
-This project is licensed under the GNU  linse- see the [LICENSE.md](https://github.com/gonzalofrancoceballos/MLP/blob/master/LICENSE) file for details
+This project is licensed under the GNU license - see the [LICENSE.md](https://github.com/gonzalofrancoceballos/MLP/blob/master/LICENSE) file for details
 
 ## Collaborating
 Here's a list of ideas to be inplemented in the future. If you are interested in collaborateing, feel free to pick any of these! If there is anything else that you would like to contribute with, please open an [issue](https://github.com/gonzalofrancoceballos/MLP/issues)

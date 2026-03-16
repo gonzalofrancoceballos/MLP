@@ -58,7 +58,7 @@ class ModelTrain:
         """Run several train steps.
 
         Args:
-            model: model to uptimize on
+            model: model to optimize on
             loss: loss function object
             train_data: train dataset containing x,y pair
             optimizer: optimizer to use in train
@@ -98,7 +98,7 @@ class ModelTrain:
                 self._train_step(
                     model, x_batch, y_batch, loss, self._train_params["reg_lambda"]
                 )
-                loss_i = self._compute_loss(model.layers[-1].A, y_batch, loss)
+                loss_i = self._compute_loss(y_batch, model.layers[-1].A, loss)
                 train_loss.append(loss_i)
                 model.train_log.append(Tensor([epoch, batch_i, loss_i]))
 

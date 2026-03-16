@@ -28,7 +28,7 @@ class Optimizer:
 
     @property
     @abstractmethod
-    def optimizier_type(self):
+    def optimizer_type(self):
         pass
 
     @abstractmethod
@@ -53,7 +53,7 @@ class GradientDescent(Optimizer):
         self.learning_rate = learning_rate
 
     @property
-    def optimizier_type(self):
+    def optimizer_type(self):
         return "gradient_descent"
 
     def initialize_parameters(self, layers):
@@ -94,7 +94,7 @@ class Adam(Optimizer):
         self.t = 1
 
     @property
-    def optimizier_type(self):
+    def optimizer_type(self):
         return "adam"
 
     def initialize_parameters(self, layers: list) -> list:
@@ -119,7 +119,7 @@ class Adam(Optimizer):
         return layers
 
     def update_weights(self, layers: list) -> list:
-        """Perform update rule/
+        """Perform update rule.
 
         Args:
             layers: layers of the model to update
